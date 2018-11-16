@@ -28,9 +28,8 @@ window.onload = function(){
                     image.href = "item.html?" + idx;
                     cell.appendChild(description);
                     cell.appendChild(image);
-
                     // cell.style.border = "outset";
-                    // cell.style.width = "300px"; 
+                    // cell.style.width = "300px";
                     idx++;
                 }
             }
@@ -95,9 +94,12 @@ function showItem(idx) {
         var orgWidth  = img.width;
         var orgHeight = img.height;
 
-        img.width = 400; // 横幅をリサイズ
-        img.height = 0.56 * img.width;
+        // img.width = 400; // 横幅をリサイズ
+        // img.height = 0.56 * img.width;
         // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
+
+        img.height = 224; // 縦幅をリサイズ
+        img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
 
         document.getElementById("image" + idx).appendChild(img);
     });
