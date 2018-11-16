@@ -10,16 +10,21 @@ showItem(); // 商品を表示する
 function showItem() {
     // 商品説明を表示
     console.log("show description");
-    itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
+    itemKeyList = ["商品名", "価格", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
     itemIdxList = [3, 5, 4, 11, 2, 0, 1];
     contract.methods.items(numItem).call()
     .then(function(item) {
         for (var i = 0; i < itemIdxList.length; i++) {
             var elem = document.createElement("p");
-            if (i == 3) {
+            if (i == 1) {
+                elem.textContent = itemKeyList[i] + " : " + item[itemIdxList[i]] + "wei";
+                document.getElementById("item").appendChild(elem);
+            } else if (i == 3) {
                 if (item[itemIdxList[i]] == true) {
-                    elem.textContent = itemKeyList[i] + " : 売切れ";
+                    elem.setAttribute("class", "text-danger");
+                    elem.textContent = itemKeyList[i] + " : Sold Out";
                 } else {
+                    elem.setAttribute("class", "text-success");
                     elem.textContent = itemKeyList[i] + " : 出品中";
                 }
                 document.getElementById("item").appendChild(elem);

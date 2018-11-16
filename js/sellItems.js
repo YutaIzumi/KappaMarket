@@ -30,7 +30,8 @@ web3js.eth.getAccounts(function(err, accounts) {
     }).then(function() {
         // DOMの作成
         var rows=[];
-        var table = document.createElement("table");
+        // var table = document.createElement("table");
+        var table = document.getElementById("table");
         var idx = 0;
         for (i = 0; i < _numSell; i++) {
             rows.push(table.insertRow(-1)); // 行の追加
@@ -52,12 +53,13 @@ web3js.eth.getAccounts(function(err, accounts) {
                     state.setAttribute("id", "state" + i);
                     cell.appendChild(state);
 
-                    cell.appendChild(document.createElement("hr"));
+                    // cell.appendChild(document.createElement("hr"));
                     
                     var shipment = document.createElement("p");
                     var btn = document.createElement("button");
                     btn.setAttribute("id", "shipment" + i);
                     btn.textContent = "発送連絡";
+                    btn.setAttribute("class", "btn btn-primary");
                     shipment.appendChild(btn);
                     cell.appendChild(shipment);
                     
@@ -65,13 +67,28 @@ web3js.eth.getAccounts(function(err, accounts) {
                     var btn = document.createElement("button");
                     btn.setAttribute("id", "buyerEvaluate" + i);
                     btn.textContent = "購入者を評価";
-                    var input = document.createElement("input");
-                    input.setAttribute("type", "number");
-                    input.setAttribute("id", "buyerValue" + i);
-                    txt = document.createTextNode("評価は－２～＋２の整数で入力して下さい．");
-                    buyerEvaluate.appendChild(txt);
-                    buyerEvaluate.appendChild(input);
-                    buyerEvaluate.appendChild(document.createTextNode(" "));
+                    btn.setAttribute("class", "btn btn-primary");
+                    
+                    // 評価を選択するセレクトフォームを作成
+                    var form = document.createElement("div");
+                    form.setAttribute("class", "form-group");
+                    var label = document.createElement("label");
+                    label.textContent = "評価を選択して下さい";
+                    label.setAttribute("for", "buyerValue" + i);
+                    var select = document.createElement("select");
+                    select.setAttribute("multiple", "");
+                    select.setAttribute("class", "form-control");
+                    select.setAttribute("id", "buyerValue" + i);
+                    for(value = -2; value <= 2; value++) {
+                        var option = document.createElement("option");
+                        option.textContent = value;
+                        option.value = value;
+                        select.appendChild(option);
+                    }
+                    form.appendChild(label);
+                    form.appendChild(select);
+
+                    buyerEvaluate.appendChild(form);
                     buyerEvaluate.appendChild(btn);
                     cell.appendChild(buyerEvaluate);
                     
@@ -79,6 +96,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                     var btn = document.createElement("button");
                     btn.setAttribute("id", "sellerStop" + i);
                     btn.textContent = "出品取消し";
+                    btn.setAttribute("class", "btn btn-primary");
                     sellerStop.appendChild(btn);
                     cell.appendChild(sellerStop);
 
@@ -86,11 +104,12 @@ web3js.eth.getAccounts(function(err, accounts) {
                     var btn = document.createElement("button");
                     btn.setAttribute("id", "refund" + i);
                     btn.textContent = "返金する";
+                    btn.setAttribute("class", "btn btn-primary");
                     refund.appendChild(btn);
                     cell.appendChild(refund);
                     }
-                cell.style.border = "outset";
-                cell.style.width = "500px";
+                // cell.style.border = "outset";
+                // cell.style.width = "500px";
             }
         }
         document.body.appendChild(table);

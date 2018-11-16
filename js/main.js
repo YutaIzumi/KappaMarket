@@ -10,7 +10,8 @@ window.onload = function(){
     // DOMの作成
     }).then(function() {
         var rows=[];
-        var table = document.createElement("table");
+        // var table = document.createElement("table");
+        var table = document.getElementById("table");
         var col = Math.ceil(_numItems / 3.0);
         var idx = 0;
         for (i = 0; i < col; i++) {
@@ -28,13 +29,13 @@ window.onload = function(){
                     cell.appendChild(description);
                     cell.appendChild(image);
 
-                    cell.style.border = "outset";
-                    cell.style.width = "500px"; 
+                    // cell.style.border = "outset";
+                    // cell.style.width = "300px"; 
                     idx++;
                 }
             }
         }
-        document.body.appendChild(table);
+        // document.body.appendChild(table);
         console.log("create DOM");
     
     // DOMに商品情報を入れる
@@ -51,21 +52,28 @@ function showItem(idx) {
 
     // DOMに商品情報を入れる
     contract.methods.items(idx).call().then(function(item) {
-        idxList = [3, 5, 2, 11];
-        keyList = ["商品名", "価格(wei)", "出品者", "状態"];
+        idxList = [3, 5, 11];
             
-        for (var i = 0; i < idxList.length; i++) {
-            var elem = document.createElement("p");
+        for (var i of idxList) {
+            if (i == 5) {
+                var elem = document.createElement("p");
+                elem.textContent = item[i] + "wei";
+                document.getElementById("description" + idx).appendChild(elem);
             
-            if (i == 3) {
-                if (item[idxList[i]] == true) {
-                    elem.textContent = keyList[i] + " : 売切れ";
+            } else if (i == 11) {
+                var elem = document.createElement("p");
+                if (item[i] == true) {
+                    elem.setAttribute("class", "text-danger");
+                    elem.textContent = "Sold Out";
                 } else {
-                    elem.textContent = keyList[i] + " : 出品中";
+                    elem.setAttribute("class", "text-success");
+                    elem.textContent = "出品中";
                 }
                 document.getElementById("description" + idx).appendChild(elem);
+            
             } else {
-                elem.textContent = keyList[i] + " : " + item[idxList[i]];
+                var elem = document.createElement("h6");
+                elem.textContent = item[i];
                 document.getElementById("description" + idx).appendChild(elem);
             }
         }
@@ -87,8 +95,8 @@ function showItem(idx) {
         var orgWidth  = img.width;
         var orgHeight = img.height;
 
-        img.width = 300; // 横幅を300pxにリサイズ
-        img.height = 168;
+        img.width = 400; // 横幅をリサイズ
+        img.height = 0.56 * img.width;
         // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
 
         document.getElementById("image" + idx).appendChild(img);

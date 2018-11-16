@@ -30,7 +30,8 @@ web3js.eth.getAccounts(function(err, accounts) {
     }).then(function() {
         // DOMの作成
         var rows=[];
-        var table = document.createElement("table");
+        // var table = document.createElement("table");
+        var table = document.getElementById("table");
         var idx = 0;
         for (i = 0; i < _numBuy; i++) {
             rows.push(table.insertRow(-1)); // 行の追加
@@ -51,12 +52,11 @@ web3js.eth.getAccounts(function(err, accounts) {
                     var state = document.createElement("div");
                     state.setAttribute("id", "state" + i);
                     cell.appendChild(state);
-
-                    cell.appendChild(document.createElement("hr"));
                     
                     var receive = document.createElement("p");
                     var btn = document.createElement("button");
                     btn.setAttribute("id", "receive" + i);
+                    btn.setAttribute("class", "btn btn-primary");
                     btn.textContent = "受取連絡";
                     receive.appendChild(btn);
                     cell.appendChild(receive);
@@ -64,19 +64,34 @@ web3js.eth.getAccounts(function(err, accounts) {
                     var sellerEvaluate = document.createElement("p");
                     var btn = document.createElement("button");
                     btn.setAttribute("id", "sellerEvaluate" + i);
+                    btn.setAttribute("class", "btn btn-primary");
                     btn.textContent = "出品者を評価";
-                    var input = document.createElement("input");
-                    input.setAttribute("type", "number");
-                    input.setAttribute("id", "sellerValue" + i);
-                    txt = document.createTextNode("評価は－２～＋２の整数で入力して下さい．");
-                    sellerEvaluate.appendChild(txt);
-                    sellerEvaluate.appendChild(input);
-                    sellerEvaluate.appendChild(document.createTextNode(" "));
+                    
+                    // 評価を選択するセレクトフォームを作成
+                    var form = document.createElement("div");
+                    form.setAttribute("class", "form-group");
+                    var label = document.createElement("label");
+                    label.textContent = "評価を選択して下さい";
+                    label.setAttribute("for", "sellerValue" + i);
+                    var select = document.createElement("select");
+                    select.setAttribute("multiple", "");
+                    select.setAttribute("class", "form-control");
+                    select.setAttribute("id", "sellerValue" + i);
+                    for(value = -2; value <= 2; value++) {
+                        var option = document.createElement("option");
+                        option.textContent = value;
+                        option.value = value;
+                        select.appendChild(option);
+                    }
+                    form.appendChild(label);
+                    form.appendChild(select);
+
+                    sellerEvaluate.appendChild(form);
                     sellerEvaluate.appendChild(btn);
                     cell.appendChild(sellerEvaluate);
                     }
-                cell.style.border = "outset";
-                cell.style.width = "500px";
+                // cell.style.border = "outset";
+                // cell.style.width = "500px";
             }
         }
         document.body.appendChild(table);
