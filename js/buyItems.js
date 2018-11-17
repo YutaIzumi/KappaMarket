@@ -91,7 +91,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                     cell.appendChild(sellerEvaluate);
                     }
                 // cell.style.border = "outset";
-                // cell.style.width = "500px";
+                cell.style.width = "500px";
             }
         }
         document.body.appendChild(table);

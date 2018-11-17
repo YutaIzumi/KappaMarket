@@ -35,7 +35,7 @@ web3js.eth.getAccounts(function(err, accounts) {
         var idx = 0;
         for (i = 0; i < _numSell; i++) {
             rows.push(table.insertRow(-1)); // 行の追加
-            for(j = 0; j < 2; j++) {
+            for (j = 0; j < 2; j++) {
                 cell = rows[i].insertCell(-1);
 
                 if (j == 0) {
@@ -109,7 +109,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                     cell.appendChild(refund);
                     }
                 // cell.style.border = "outset";
-                // cell.style.width = "500px";
+                cell.style.width = "500px";
             }
         }
         document.body.appendChild(table);

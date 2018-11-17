@@ -9,7 +9,7 @@ window.onload = function(){
     
     // DOMの作成
     }).then(function() {
-        var rows=[];
+        var rows = [];
         // var table = document.createElement("table");
         var table = document.getElementById("table");
         var col = Math.ceil(_numItems / 3.0);
@@ -98,7 +98,7 @@ function showItem(idx) {
         // img.height = 0.56 * img.width;
         // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
 
-        img.height = 224; // 縦幅をリサイズ
+        img.height = 200; // 縦幅をリサイズ
         img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
 
         document.getElementById("image" + idx).appendChild(img);
