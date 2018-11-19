@@ -192,6 +192,7 @@ function showItem(numItem, idx) {
 
         img.height = 224; // 縦幅をリサイズ
         img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
+        img.style.borderRadius = "10px";
         
         document.getElementById("image" + idx).appendChild(img);
     });
