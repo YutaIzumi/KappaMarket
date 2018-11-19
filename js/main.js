@@ -21,13 +21,18 @@ window.onload = function(){
 
                 if (idx < _numItems) {
                     // 商品の説明と画像を表示するDOMを作成
+                    var name = document.createElement("a");
                     var description = document.createElement("div");
                     var image = document.createElement("a");
+                    name.setAttribute("id", "name" + idx);
+                    name.href = "item.html?" + idx;
                     description.setAttribute("id", "description" + idx);
                     image.setAttribute("id", "image" + idx);
                     image.href = "item.html?" + idx;
+                    cell.appendChild(name);
                     cell.appendChild(description);
                     cell.appendChild(image);
+                    cell.style.textAlign   = "center";
                     // cell.style.border = "outset";
                     // cell.style.width = "300px";
                     idx++;
@@ -73,7 +78,7 @@ function showItem(idx) {
             } else {
                 var elem = document.createElement("h6");
                 elem.textContent = item[i];
-                document.getElementById("description" + idx).appendChild(elem);
+                document.getElementById("name" + idx).appendChild(elem);
             }
         }
     });
@@ -89,7 +94,7 @@ function showItem(idx) {
         img.setAttribute("id", "ipfsImage");
         img.setAttribute("src", imageUrl);
         img.setAttribute("alt", "image");
-            
+        
         // 画像のリサイズ
         var orgWidth  = img.width;
         var orgHeight = img.height;
@@ -101,7 +106,9 @@ function showItem(idx) {
         img.height = 200; // 縦幅をリサイズ
         img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
 
-        document.getElementById("image" + idx).appendChild(img);
+        flag = document.getElementById("image" + idx).appendChild(img);
+        console.log(flag);
+        console.log("set image " + idx);
     });
 
     // 商品画像を表示する
