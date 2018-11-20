@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Kappaマーケット</title>
+  <link rel="stylesheet" href="../css/bootstrap.min.css">
+  <script language="javascript" type="text/javascript" src="../js/web3.min.js"></script>
+  <script language="javascript" type="text/javascript" src="../js/KappaMarketAbi.js"></script>
+  <script type="text/javascript" src="../js/check.js"></script>
+  <script type="text/javascript" src="../js/account.js"></script>
+</head>
+<header>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <a class="navbar-brand" href="main.html">KappaMarket</a>
+      <div class="collapse navbar-collapse" id="navbarColor01">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="main.html">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="sell.html">出品する</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="sellItems.html">出品商品一覧</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="buyItems.html">購入商品一覧</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="account.html">会員情報検索</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="register.html">会員登録</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  <p class="text-danger" style="text-align:center">※これはデモです．本当に売買はできません．このスマートコントラクトはRopstenテストネットワークで動作しています．</p>
+</header>
+<body>
+<div class="col-md-6">
+  <div class="form-group">
+    <label for="address">検索したいユーザーのアドレスを入力して下さい．</label>
+    <input type="text" class="form-control" id="address" placeholder="">
+  </div>
+  <p><button onclick="showAccount()" class="btn btn-primary">アカウント情報表示</button></p><br>
+  <div id="account"></div>
+</div>
+</body>
+</html>
