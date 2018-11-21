@@ -10,7 +10,6 @@ window.onload = function(){
     // DOMの作成
     }).then(function() {
         var rows = [];
-        // var table = document.createElement("table");
         var table = document.getElementById("table");
         var col = Math.ceil(_numItems / 3.0);
         var idx = 0;
@@ -21,20 +20,25 @@ window.onload = function(){
 
                 if (idx < _numItems) {
                     // 商品の説明と画像を表示するDOMを作成
-                    var name = document.createElement("a");
-                    var description = document.createElement("div");
-                    var image = document.createElement("a");
-                    name.setAttribute("id", "name" + idx);
+                    var name = document.createElement("a");          // 商品名
+                    var description = document.createElement("div"); // 商品説明
+                    var image = document.createElement("a");         // 商品画像
+                    
+                    name.id = "name" + idx;
                     name.href = "item.html?" + idx;
-                    description.setAttribute("id", "description" + idx);
-                    image.setAttribute("id", "image" + idx);
+
+                    description.id = "description" + idx;
+
+                    image.id = "image" + idx;
                     image.href = "item.html?" + idx;
+
                     cell.appendChild(name);
                     cell.appendChild(description);
                     cell.appendChild(image);
                     cell.style.textAlign   = "center";
                     // cell.style.border = "outset";
                     // cell.style.width = "300px";
+                    
                     idx++;
                 }
             }
@@ -84,55 +88,37 @@ function showItem(idx) {
     });
         
     // 商品画像を表示する
-    // ipfsを使用する
     contract.methods.images(idx).call().then(function(image) {
+        // imageUrl = "http://drive.google.com/uc?export=view&id=" + image.googleDocID; // googleDriveを使用する場合
         // imageUrl = "http://localhost:8080/ipfs/" + image.ipfsHash; // ipfsがインストールされている場合
         imageUrl = "https://ipfs.io/ipfs/" + image.ipfsHash; // ipfsがインストールされていない場合
-            
+        
         // 生成する要素と属性
         var img = document.createElement("img");
-        img.setAttribute("id", "ipfsImage");
-        img.setAttribute("src", imageUrl);
-        img.setAttribute("alt", "image");
-        
-        // 画像のリサイズ
-        var orgWidth  = img.width;
-        var orgHeight = img.height;
+        img.id = "ipfsImage" + idx;
+        img.src = imageUrl;
+        img.alt = "ipfsImage" + idx;
 
-        // img.width = 400; // 横幅をリサイズ
-        // img.height = 0.56 * img.width;
-        // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
+        // 画像の読込みを待ってから実行
+        img.addEventListener("load", function() {
+            // 画像のリサイズ
+            var orgWidth  = img.width;
+            var orgHeight = img.height;
+            console.log("orgWidth " + orgWidth);
+            console.log("orgHeight " + orgHeight);
 
-        img.height = 200; // 縦幅をリサイズ
-        img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
-        img.style.borderRadius = "10px";
+            // img.width = 400; // 横幅をリサイズ
+            // img.height = 0.56 * img.width;
+            // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
 
-        flag = document.getElementById("image" + idx).appendChild(img);
-        console.log(flag);
-        console.log("set image " + idx);
+            img.height = 200; // 縦幅をリサイズ
+            img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
+            img.style.borderRadius = "10px";
+
+            // ブラウザに表示する
+            flag = document.getElementById("image" + idx).appendChild(img);
+            console.log(flag);
+            console.log("set image " + idx);
+        });
     });
-
-    // 商品画像を表示する
-    // googleドライブを使用する
-    /*
-    contract.methods.images(item).call().then(function(image){
-        imageUrl = "http://drive.google.com/uc?export=view&id=" + image.googleDocID;
-        // var win = window.open(imageUrl, "_blank");
-                
-        // 生成する要素と属性
-        var img = document.createElement("img");
-        img.setAttribute("id", "googleImage");
-        img.setAttribute("src", imageUrl);
-        img.setAttribute("alt", "image");
-            
-        // 画像のリサイズ
-        var orgWidth  = img.width;
-        var orgHeight = img.height;
-        img.width = 400; // 横幅を400pxにリサイズ
-        img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
-        
-        document.getElementById("image" + idx).appendChild(img);
-        document.getElementById("image" + idx).appendChild(document.createElement("br"));
-    });
-    */
 }

@@ -54,17 +54,19 @@ function showItem() {
         
         // 生成する要素と属性
         var img = document.createElement("img");
-        img.setAttribute("id", "ipfsImage");
-        img.setAttribute("src", imageUrl);
-        img.setAttribute("alt", "image");
+        img.id = "ipfsImage" + numItem;
+        img.src = imageUrl;
+        img.alt = "ipfsImage" + numItem;
         
-        var orgWidth  = img.width;
-        var orgHeight = img.height;
-        img.width = 400;  // 幅固定
-        img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
-        img.style.borderRadius = "10px";
-        
-        document.getElementById("image").appendChild(img);
+        // 画像の読込みを待ってから実行
+        img.addEventListener("load", function() {
+            var orgWidth  = img.width;
+            var orgHeight = img.height;
+            img.width = 400;  // 幅固定
+            img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
+            img.style.borderRadius = "10px";
+            document.getElementById("image").appendChild(img);
+        });
     });
 }
 

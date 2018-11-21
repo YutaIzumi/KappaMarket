@@ -42,20 +42,21 @@ web3js.eth.getAccounts(function(err, accounts) {
                     // 商品の説明と画像を表示するDOMを作成
                     var image = document.createElement("a");
                     var description = document.createElement("div");
-                    image.setAttribute("id", "image" + i);
-                    description.setAttribute("id", "description" + i);
+
+                    image.id =  "image" + i;
+                    description.id = "description" + i;
                     cell.appendChild(image);
                     cell.appendChild(description);
                 
                 } else {
                     // 取引の状態と取引を進めるボタン表示するDOMを作成
                     var state = document.createElement("div");
-                    state.setAttribute("id", "state" + i);
+                    state.id = "state" + i;
                     cell.appendChild(state);
                     
                     var receive = document.createElement("p");
                     var btn = document.createElement("button");
-                    btn.setAttribute("id", "receive" + i);
+                    btn.id = "receive" + i;
                     btn.setAttribute("class", "btn btn-primary");
                     btn.textContent = "受取連絡";
                     receive.appendChild(btn);
@@ -63,20 +64,23 @@ web3js.eth.getAccounts(function(err, accounts) {
 
                     var sellerEvaluate = document.createElement("p");
                     var btn = document.createElement("button");
-                    btn.setAttribute("id", "sellerEvaluate" + i);
+                    btn.id = "sellerEvaluate" + i;
                     btn.setAttribute("class", "btn btn-primary");
                     btn.textContent = "出品者を評価";
                     
                     // 評価を選択するセレクトフォームを作成
                     var form = document.createElement("div");
                     form.setAttribute("class", "form-group");
+                    
                     var label = document.createElement("label");
                     label.textContent = "評価を選択して下さい";
                     label.setAttribute("for", "sellerValue" + i);
+
                     var select = document.createElement("select");
                     select.setAttribute("multiple", "");
                     select.setAttribute("class", "form-control");
-                    select.setAttribute("id", "sellerValue" + i);
+                    select.id = "sellerValue" + i;
+
                     for(value = -2; value <= 2; value++) {
                         var option = document.createElement("option");
                         option.textContent = value;
@@ -157,22 +161,25 @@ function showItem(numItem, idx) {
         
         // 生成する要素と属性
         var img = document.createElement("img");
-        img.setAttribute("id", "ipfsImage")
-        img.setAttribute("src", imageUrl);
-        img.setAttribute("alt", "image");
-        
-        var orgWidth  = img.width;
-        var orgHeight = img.height;
-        
-        // img.width = 300;
-        // img.height = 168;
-        // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
+        img.id = "ipfsImage" + idx;
+        img.src = imageUrl;
+        img.alt = "ipfsImage" + idx;
 
-        img.height = 224; // 縦幅をリサイズ
-        img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
-        img.style.borderRadius = "10px";
-        
-        document.getElementById("image" + idx).appendChild(img);
+        // 画像の読込みを待ってから実行
+        img.addEventListener("load", function() {
+            var orgWidth  = img.width;
+            var orgHeight = img.height;
+            
+            // img.width = 300;
+            // img.height = 168;
+            // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
+
+            img.height = 224; // 縦幅をリサイズ
+            img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
+            img.style.borderRadius = "10px";
+            
+            document.getElementById("image" + idx).appendChild(img);
+        });
     });
 }
 
