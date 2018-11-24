@@ -6,6 +6,7 @@ MIT
 ウェブページを以下に公開しています．
 
 http://kappaichiba.html.xdomain.jp/html/main.html
+
 ※まだデモです．本当に売買はできません．このアプリはRopstenテストネットワークで動作しています．
 
 Qiitaに記事を公開しています．
