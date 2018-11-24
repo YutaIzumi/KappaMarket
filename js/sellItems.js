@@ -1,5 +1,13 @@
 var _numSell;
 var _sellItem;
+var col;
+
+// スクリーンサイズによって表示方法を変更する
+if (screen.width > 650) {
+    col = 2.0;
+} else {
+    col = 1.0;
+}
 
 // メタマスクがインストールされているかのチェック
 if (typeof web3 !== "undefined") {
@@ -33,10 +41,88 @@ web3js.eth.getAccounts(function(err, accounts) {
         var table = document.getElementById("table");
         for (i = 0; i < _numSell; i++) {
             rows.push(table.insertRow(-1)); // 行の追加
-            for (j = 0; j < 2; j++) {
+            for (j = 0; j < col; j++) {
                 cell = rows[i].insertCell(-1);
 
-                if (j == 0) {
+                if (col == 2) {
+                    if (j == 0) {
+                        // 商品の説明と画像を表示するDOMを作成
+                        var image = document.createElement("a");
+                        var description = document.createElement("div");
+                        
+                        image.id = "image" + i;
+                        description.id = "description" + i;
+                        cell.appendChild(image);
+                        cell.appendChild(description);
+                    
+                    } else {
+                        // 取引の状態と取引を進めるボタン表示するDOMを作成
+                        var state = document.createElement("div");
+                        
+                        state.id = "state" + i;
+                        cell.appendChild(state);
+                        
+                        var shipment = document.createElement("p");
+                        var btn = document.createElement("button");
+
+                        btn.id = "shipment" + i;
+                        btn.textContent = "発送連絡";
+                        btn.setAttribute("class", "btn btn-primary");
+                        shipment.appendChild(btn);
+                        cell.appendChild(shipment);
+                        
+                        var buyerEvaluate = document.createElement("p");
+                        var btn = document.createElement("button");
+
+                        btn.id = "buyerEvaluate" + i;
+                        btn.textContent = "購入者を評価";
+                        btn.setAttribute("class", "btn btn-primary");
+                        
+                        // 評価を選択するセレクトフォームを作成
+                        var form = document.createElement("div");
+                        form.setAttribute("class", "form-group");
+
+                        var label = document.createElement("label");
+                        label.textContent = "評価を選択して下さい";
+                        label.setAttribute("for", "buyerValue" + i);
+
+                        var select = document.createElement("select");
+                        select.setAttribute("multiple", "");
+                        select.setAttribute("class", "form-control");
+                        select.id = "buyerValue" + i;
+                        
+                        for(value = -2; value <= 2; value++) {
+                            var option = document.createElement("option");
+                            option.textContent = value;
+                            option.value = value;
+                            select.appendChild(option);
+                        }
+                        form.appendChild(label);
+                        form.appendChild(select);
+
+                        buyerEvaluate.appendChild(form);
+                        buyerEvaluate.appendChild(btn);
+                        cell.appendChild(buyerEvaluate);
+                        
+                        var sellerStop = document.createElement("p");
+                        var btn = document.createElement("button");
+
+                        btn.id = "sellerStop" + i;
+                        btn.textContent = "出品取消し";
+                        btn.setAttribute("class", "btn btn-primary");
+                        sellerStop.appendChild(btn);
+                        cell.appendChild(sellerStop);
+
+                        var refund = document.createElement("p");
+                        var btn = document.createElement("button");
+
+                        btn.id = "refund" + i;
+                        btn.textContent = "返金する";
+                        btn.setAttribute("class", "btn btn-primary");
+                        refund.appendChild(btn);
+                        cell.appendChild(refund);
+                    }
+                } else {
                     // 商品の説明と画像を表示するDOMを作成
                     var image = document.createElement("a");
                     var description = document.createElement("div");
@@ -45,11 +131,10 @@ web3js.eth.getAccounts(function(err, accounts) {
                     description.id = "description" + i;
                     cell.appendChild(image);
                     cell.appendChild(description);
-                
-                } else {
+
                     // 取引の状態と取引を進めるボタン表示するDOMを作成
                     var state = document.createElement("div");
-                    
+                        
                     state.id = "state" + i;
                     cell.appendChild(state);
                     
@@ -112,7 +197,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                     btn.setAttribute("class", "btn btn-primary");
                     refund.appendChild(btn);
                     cell.appendChild(refund);
-                    }
+                }
                 // cell.style.border = "outset";
                 cell.style.width = "500px";
             }

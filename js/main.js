@@ -1,5 +1,15 @@
 window.onload = function(){
     var _numItems;
+    var col;
+
+    // スクリーンサイズによって表示する商品の列数を変更する
+    if (screen.width > 900) {
+        col = 3.0;
+    } else if (screen.width < 900 && screen.width > 600) {
+        col = 2.0;
+    } else {
+        col = 1.0;
+    }
 
     // 出品されている商品数を取得する
     contract.methods.numItems().call()
@@ -11,11 +21,11 @@ window.onload = function(){
     }).then(function() {
         var rows = [];
         var table = document.getElementById("table");
-        var col = Math.ceil(_numItems / 3.0);
+        var row = Math.ceil(_numItems / col);
         var idx = 0;
-        for (i = 0; i < col; i++) {
+        for (i = 0; i < row; i++) {
             rows.push(table.insertRow(-1)); // 行の追加
-            for(j = 0; j < 3; j++) {
+            for(j = 0; j < col; j++) {
                 cell = rows[i].insertCell(-1);
 
                 if (idx < _numItems) {

@@ -2,7 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Kappaマーケット</title>
+  <title>KappaMarket</title>
+  <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="../css/bootstrap.min.css">
   <script language="javascript" type="text/javascript" src="../js/web3.min.js"></script>
   <script language="javascript" type="text/javascript" src="../js/KappaMarketAbi.js"></script>
@@ -20,7 +21,7 @@
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="navbar-collapse collapse show" id="navbarColor01">
+    <div class="navbar-collapse collapse" id="navbarColor01">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
           <a class="nav-link" href="main.html">Home <span class="sr-only">(current)</span></a>
@@ -46,12 +47,10 @@
 </header>
 <body>
   <div class="container-fluid">
-    <table id="table" class="table">
+    <table id="table" class="table" >
       <tr>
         <td>
           <div id="image"></div>
-        </td>
-        <td>
           <div id="item"></div>
           <p><button onclick="buy()" class="btn btn-primary">こちらから購入できます</button></p>
         </td>
