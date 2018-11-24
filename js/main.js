@@ -111,7 +111,7 @@ function showItem(idx) {
             // img.height = 0.56 * img.width;
             // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
 
-            img.height = 200; // 縦幅をリサイズ
+            img.height = 150; // 縦幅をリサイズ
             img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
             img.style.borderRadius = "10px";
 

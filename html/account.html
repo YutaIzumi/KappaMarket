@@ -8,43 +8,50 @@
   <script language="javascript" type="text/javascript" src="../js/KappaMarketAbi.js"></script>
   <script type="text/javascript" src="../js/check.js"></script>
   <script type="text/javascript" src="../js/account.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
 </head>
 <header>
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <a class="navbar-brand" href="main.html">KappaMarket</a>
-      <div class="collapse navbar-collapse" id="navbarColor01">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="main.html">Home <span class="sr-only">(current)</span></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="sell.html">出品する</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="sellItems.html">出品商品一覧</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="buyItems.html">購入商品一覧</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="account.html">会員情報検索</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="register.html">会員登録</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  <p class="text-danger" style="text-align:center">※これはデモです．本当に売買はできません．このスマートコントラクトはRopstenテストネットワークで動作しています．</p>
+    <a class="navbar-brand" href="main.html">KappaMarket</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="navbar-collapse collapse show" id="navbarColor01">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="main.html">Home <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="sell.html">出品する</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="sellItems.html">出品商品一覧</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="buyItems.html">購入商品一覧</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="account.html">会員情報検索</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="register.html">会員登録</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
 </header>
 <body>
-<div class="col-md-6">
-  <div class="form-group">
-    <label for="address">検索したいユーザーのアドレスを入力して下さい．</label>
-    <input type="text" class="form-control" id="address" placeholder="">
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="address">検索したいユーザーのアドレスを入力して下さい．</label>
+      <input type="text" class="form-control" id="address" placeholder="">
+    </div>
+    <p><button onclick="showAccount()" class="btn btn-primary">アカウント情報表示</button></p><br>
+    <div id="account"></div>
   </div>
-  <p><button onclick="showAccount()" class="btn btn-primary">アカウント情報表示</button></p><br>
-  <div id="account"></div>
-</div>
 </body>
 </html>
