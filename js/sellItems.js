@@ -1,9 +1,10 @@
 var _numSell;
 var _sellItem;
 var col;
+var threshold = 750;
 
 // スクリーンサイズによって表示方法を変更する
-if (screen.width > 650) {
+if (screen.width > threshold) {
     col = 2.0;
 } else {
     col = 1.0;
@@ -199,7 +200,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                     cell.appendChild(refund);
                 }
                 // cell.style.border = "outset";
-                cell.style.width = "500px";
+                // cell.style.width = "500px";
             }
         }
         document.body.appendChild(table);
@@ -282,7 +283,12 @@ function showItem(numItem, idx) {
             // img.height = 168;
             // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
 
-            img.height = 224; // 縦幅をリサイズ
+            if (screen.width < threshold) {
+                img.height = 150;
+            } else {
+                img.height = 200;
+            }
+
             img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
             img.style.borderRadius = "10px";
             

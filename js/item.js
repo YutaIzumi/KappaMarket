@@ -62,7 +62,11 @@ function showItem() {
         img.addEventListener("load", function() {
             var orgWidth  = img.width;
             var orgHeight = img.height;
-            img.width = 400;  // 幅固定
+            if (screen.width < 600) {
+                img.width = 300;
+            } else {
+                img.width = 500;
+            }
             img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
             img.style.borderRadius = "10px";
             document.getElementById("image").appendChild(img);
