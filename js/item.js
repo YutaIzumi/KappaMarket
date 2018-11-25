@@ -64,6 +64,7 @@ function showItem() {
             var orgHeight = img.height;
             if (screen.width < 600) {
                 img.width = screen.width * 0.85;
+                document.getElementById("image").align = "center";
             } else {
                 img.width = 500;
             }
