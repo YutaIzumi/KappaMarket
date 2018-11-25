@@ -45,7 +45,7 @@ window.onload = function(){
                     cell.appendChild(name);
                     cell.appendChild(description);
                     cell.appendChild(image);
-                    cell.style.textAlign   = "center";
+                    cell.style.textAlign = "center";
                     // cell.style.border = "outset";
                     // cell.style.width = "300px";
                     

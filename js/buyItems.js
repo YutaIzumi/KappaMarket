@@ -106,11 +106,14 @@ web3js.eth.getAccounts(function(err, accounts) {
                 } else {
                     // 商品の説明と画像を表示するDOMを作成
                     var image = document.createElement("a");
+                    var image_div = document.createElement("div");
                     var description = document.createElement("div");
 
                     image.id =  "image" + i;
+                    image_div.align = "center";
                     description.id = "description" + i;
-                    cell.appendChild(image);
+                    image_div.appendChild(image);
+                    cell.appendChild(image_div);
                     cell.appendChild(description);
 
                     // 取引の状態と取引を進めるボタン表示するDOMを作成
@@ -196,7 +199,7 @@ web3js.eth.getAccounts(function(err, accounts) {
 // 商品を表示する関数
 function showItem(numItem, idx) {
     // 商品説明
-    itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"]
+    itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
     itemIdxList = [3, 5, 4, 11, 2, 0, 1];
     contract.methods.items(numItem).call().then(function(item) {
         for (var i = 0; i < itemIdxList.length; i++) {
@@ -239,12 +242,12 @@ function showItem(numItem, idx) {
             // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
 
             if (screen.width < threshold) {
-                img.height = 150;
+                img.width = screen.width * 0.85;
+                img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
             } else {
                 img.height = 200;
+                img.width = orgWidth * (img.height / orgHeight); // 横幅を高さの変化割合に合わせる
             }
-
-            img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
             img.style.borderRadius = "10px";
             
             document.getElementById("image" + idx).appendChild(img);

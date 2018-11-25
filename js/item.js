@@ -63,7 +63,7 @@ function showItem() {
             var orgWidth  = img.width;
             var orgHeight = img.height;
             if (screen.width < 600) {
-                img.width = 300;
+                img.width = screen.width * 0.85;
             } else {
                 img.width = 500;
             }
