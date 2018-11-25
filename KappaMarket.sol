@@ -1,10 +1,11 @@
-pragma solidity ^0.4.23;
+pragma solidity ^0.4.25;
 
 contract KappaMarket {
 
     address owner;        // コントラクトオーナーのアドレス
     address donation;     // ユニセフのアドレス 
     uint public numItems; // 商品数
+    bool public stopped;  // trueの場合Circuit Breakerが発動し，全てのコントラクトが使用不可能になる
 
     // コンストラクタ
     constructor() public {
@@ -18,6 +19,17 @@ contract KappaMarket {
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
+    }
+
+    // Circuit Breaker
+    modifier isStopped {
+        require(!stopped);
+        _;
+    }
+    
+    // Circuit Breakerを発動，停止する関数
+    function toggleCircuit(bool _stopped) public onlyOwner {
+        stopped = _stopped;
     }
 
     // コントラクトの呼び出しがアカウント情報登録済みユーザーか確認
@@ -73,7 +85,7 @@ contract KappaMarket {
     mapping(uint => bool) public refundFlags; // 返金すると，falseからtrueに変わる
 
     // アカウント情報を登録する関数
-    function registerAccount(string _name, string _email) public {
+    function registerAccount(string _name, string _email) public onlyUser isStopped {
         require(!accounts[msg.sender].resistered); // 未登録のethアドレスか確認
 
         accounts[msg.sender].name = _name;   // 名前
@@ -82,13 +94,13 @@ contract KappaMarket {
     }
 
     // アカウント情報を修正する関数
-    function modifyAccount(string _name, string _email) public onlyUser {
+    function modifyAccount(string _name, string _email) public onlyUser isStopped {
         accounts[msg.sender].name = _name;   // 名前
         accounts[msg.sender].email = _email; // emailアドレス
     }
 
     // 出品する関数
-    function sell(string _name, string _description, uint _price, string _googleDocID, string _ipfsHash) public onlyUser {
+    function sell(string _name, string _description, uint _price, string _googleDocID, string _ipfsHash) public onlyUser isStopped {
         items[numItems].sellerAddr = msg.sender;            // 出品者のethアドレス
         items[numItems].seller = accounts[msg.sender].name; // 出品者名
         items[numItems].name = _name;                       // 商品名
@@ -102,8 +114,10 @@ contract KappaMarket {
     }
 
     // 出品内容を変更する関数
-    function modifyItem(uint _numItems, string _name, string _description, uint _price, string _googleDocID, string _IPFSHash) public onlyUser {
+    function modifyItem(uint _numItems, string _name, string _description, uint _price, string _googleDocID, string _IPFSHash) public onlyUser isStopped {
         require(items[_numItems].sellerAddr == msg.sender);  // コントラクトの呼び出しが出品者か確認
+        require(!items[_numItems].payment);                  // 購入されていない商品か確認
+        require(!items[_numItems].stopSell);                 // 出品中の商品か確認
 
         items[_numItems].seller = accounts[msg.sender].name; // 出品者名
         items[_numItems].name = _name;                       // 商品名
@@ -114,7 +128,7 @@ contract KappaMarket {
     }
 
     // 購入する関数
-    function buy(uint _numItems) public payable onlyUser {
+    function buy(uint _numItems) public payable onlyUser isStopped {
         require(_numItems < numItems);                // 存在する商品か確認
         require(!items[_numItems].payment);           // 商品が売り切れていないか確認
         require(!items[_numItems].stopSell);          // 出品取消しになっていないか確認
@@ -128,19 +142,21 @@ contract KappaMarket {
     }
 
     // 発送完了時に呼び出される関数
-    function ship(uint _numItems) public onlyUser {
+    function ship(uint _numItems) public onlyUser isStopped {
         require(items[_numItems].sellerAddr == msg.sender); // コントラクトの呼び出しが出品者か確認
-        require(_numItems < numItems);     // 存在する商品か確認
-        require(items[_numItems].payment); // 入金済み商品か確認
+        require(_numItems < numItems);       // 存在する商品か確認
+        require(items[_numItems].payment);   // 入金済み商品か確認
+        require(!items[_numItems].shipment); // 未発送の商品か確認
 
         items[_numItems].shipment = true;  // 発送済みにする
     }
 
     // 商品受取り時に呼び出される関数
-    function receive(uint _numItems) public payable onlyUser {
+    function receive(uint _numItems) public payable onlyUser isStopped {
         require(items[_numItems].buyerAddr == msg.sender); // コントラクトの呼び出しが購入者か確認
-        require(_numItems < numItems);      // 存在する商品か確認
-        require(items[_numItems].shipment); // 発送済み商品か確認
+        require(_numItems < numItems);          // 存在する商品か確認
+        require(items[_numItems].shipment);     // 発送済み商品か確認
+        require(!items[_numItems].receivement); // 受取前の商品か確認
 
         items[_numItems].receivement = true;
         // 受取りが完了したら出品者とユニセフにethを送金する
@@ -149,7 +165,7 @@ contract KappaMarket {
     }
 
     // 購入者が出品者を評価する関数
-    function sellerEvaluate(uint _numItems, int _reputate) public onlyUser {
+    function sellerEvaluate(uint _numItems, int _reputate) public onlyUser isStopped {
         require(items[_numItems].buyerAddr == msg.sender); // コントラクトの呼び出しが購入者か確認
         require(_numItems < numItems);                     // 存在する商品か確認
         require(_reputate >= -2 && _reputate <= 2);        // 評価は-2 ~ +2の範囲で行う
@@ -161,7 +177,7 @@ contract KappaMarket {
     }
 
     // 出品者が購入者を評価する関数
-    function buyerEvaluate(uint _numItems, int _reputate) public onlyUser {
+    function buyerEvaluate(uint _numItems, int _reputate) public onlyUser isStopped {
         require(items[_numItems].sellerAddr == msg.sender); // コントラクトの呼び出しが出品者か確認
         require(_numItems < numItems);                      // 存在する商品か確認
         require(_reputate >= -2 && _reputate <= 2);         // 評価は-2 ~ +2の範囲で行う
@@ -173,26 +189,28 @@ contract KappaMarket {
     }
 
     // 出品を取り消す関数（出品者）
-    function sellerStop(uint _numItems) public onlyUser {
+    function sellerStop(uint _numItems) public onlyUser isStopped {
         require(items[_numItems].sellerAddr == msg.sender); // コントラクトの呼び出しが出品者か確認
         require(_numItems < numItems);                      // 存在する商品か確認
-        require(!items[_numItems].payment);                 // 出品中の商品か確認
+        require(!items[_numItems].stopSell);                // 出品中の商品か確認
+        require(!items[_numItems].payment);                 // 購入されていない商品か確認
 
         items[_numItems].stopSell = true; // 出品の取消し
     }
 
     // 出品を取り消す関数（オーナー）
-    function ownerStop(uint _numItems) public onlyOwner {
+    function ownerStop(uint _numItems) public onlyOwner isStopped {
         require(items[_numItems].sellerAddr == msg.sender); // コントラクトの呼び出しが出品者か確認
         require(_numItems < numItems);                      // 存在する商品か確認
-        require(!items[_numItems].payment);                 // 出品中の商品か確認
+        require(!items[_numItems].stopSell);                // 出品中の商品か確認
+        require(!items[_numItems].payment);                 // 購入されていない商品か確認
 
         items[_numItems].stopSell = true;
     }
 
     // 購入者へ返金する関数
     // 商品が届かなかった時に使用する
-    function ownerRefund(uint _numItems) public payable onlyOwner {
+    function ownerRefund(uint _numItems) public payable onlyOwner isStopped {
         require(_numItems < numItems);          // 存在する商品か確認
         require(items[_numItems].payment);      // 入金済み商品か確認
         require(!items[_numItems].receivement); // 出品者が代金を受取る前か確認
@@ -202,7 +220,7 @@ contract KappaMarket {
         items[_numItems].buyerAddr.transfer(items[_numItems].price); // 購入者へ返金
     }
 
-    function sellerRefund(uint _numItems) public payable {
+    function sellerRefund(uint _numItems) public payable onlyUser isStopped {
         require(_numItems < numItems);                      // 存在する商品か確認
         require(msg.sender == items[_numItems].sellerAddr); // コントラクトの呼び出しが出品者か確認
         require(items[_numItems].payment);                  // 入金済み商品か確認
