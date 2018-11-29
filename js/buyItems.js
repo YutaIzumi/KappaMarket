@@ -18,7 +18,8 @@ if (typeof web3 !== "undefined") {
 }
 
 // コントラクトのアドレス
-const address = "0xe0a5d61f329ca84c5a8e8d59130d7fe8c0a388f4";
+// const address = "0xe0a5d61f329ca84c5a8e8d59130d7fe8c0a388f4"; // ver.1.0
+const address = "0xb54de6280f9b11fe39cd18a77446837d3aedb883";
 
 // コントラクトのインスタンスを生成
 contract = new web3js.eth.Contract(abi, address);

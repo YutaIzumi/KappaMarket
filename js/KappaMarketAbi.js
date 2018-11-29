@@ -1,4 +1,4 @@
-var abi = [
+abi = [
 	{
 		"constant": true,
 		"inputs": [
@@ -237,6 +237,20 @@ var abi = [
 	},
 	{
 		"constant": true,
+		"inputs": [],
+		"name": "stopped",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
 		"inputs": [
 			{
 				"name": "",
@@ -270,6 +284,25 @@ var abi = [
 		"outputs": [],
 		"payable": true,
 		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"name": "refundFlags",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -379,6 +412,20 @@ var abi = [
 		"outputs": [],
 		"payable": true,
 		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_stopped",
+				"type": "bool"
+			}
+		],
+		"name": "toggleCircuit",
+		"outputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
