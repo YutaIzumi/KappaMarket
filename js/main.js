@@ -1,7 +1,7 @@
-window.onload = function(){
-    var _numItems;
-    var col;
+var _numItems;
+var col;
 
+window.onload = function(){
     // スクリーンサイズによって表示する商品の列数を変更する
     if (screen.width > 900) {
         col = 3.0;
@@ -121,7 +121,12 @@ function showItem(idx) {
             // img.height = 0.56 * img.width;
             // img.height = orgHeight * (img.width / orgWidth); // 高さを横幅の変化割合に合わせる
 
-            img.height = 150; // 縦幅をリサイズ
+            if (col == 1) {
+                img.height = 150; // 縦幅をリサイズ
+            }
+            else {
+                img.height = 170; // 縦幅をリサイズ
+            }
             img.width = orgWidth * (img.height / orgHeight); // 高さを横幅の変化割合に合わせる
             img.style.borderRadius = "10px";
 
