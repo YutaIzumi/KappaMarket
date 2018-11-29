@@ -85,7 +85,7 @@ contract KappaMarket {
     mapping(uint => bool) public refundFlags; // 返金すると，falseからtrueに変わる
 
     // アカウント情報を登録する関数
-    function registerAccount(string _name, string _email) public onlyUser isStopped {
+    function registerAccount(string _name, string _email) public isStopped {
         require(!accounts[msg.sender].resistered); // 未登録のethアドレスか確認
 
         accounts[msg.sender].name = _name;   // 名前
