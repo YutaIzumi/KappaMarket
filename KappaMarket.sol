@@ -171,8 +171,8 @@ contract KappaMarket {
         require(_reputate >= -2 && _reputate <= 2);        // •]‰¿‚Í-2 ~ +2‚Ì”ÍˆÍ‚Ås‚¤
         require(!items[_numItems].sellerReputate);         // w“üÒ‚Ì•]‰¿‚ªŠ®—¹‚ğ‚µ‚Ä‚¢‚È‚¢‚±‚Æ‚ğŠm”F
 
-        accounts[items[_numItems].sellerAddr].numTransactions++;        // w“üÒ‚Ìæˆø‰ñ”‚Ì‰ÁZ
-        accounts[items[_numItems].sellerAddr].reputations += _reputate; // w“üÒ‚Ì•]‰¿‚ÌXV
+        accounts[items[_numItems].sellerAddr].numTransactions++;        // o•iÒ‚Ìæˆø‰ñ”‚Ì‰ÁZ
+        accounts[items[_numItems].sellerAddr].reputations += _reputate; // o•iÒ‚Ì•]‰¿‚ÌXV
         items[_numItems].sellerReputate = true;                         // •]‰¿Ï‚İ‚É‚·‚é
     }
 
