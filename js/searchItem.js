@@ -14,6 +14,19 @@ if (searchedItems == "") {
         message.textContent = "お探しの商品は見つかりませんでした．";
         message.style.textAlign = "center";
         document.body.appendChild(message);
+
+        // 出品されている商品数を取得する
+        contract.methods.numItems().call()
+        .then(function(numItems) {
+            _numItems = numItems;
+            console.log("numItems is " + _numItems);
+
+        // 全ての商品名と商品番号を記録する
+        }).then(function() {
+            for (idx = 0; idx < _numItems; idx++) {
+                getItemIdx(idx);
+            }
+        });
     }
 
 } else {
