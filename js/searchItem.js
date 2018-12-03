@@ -1,43 +1,52 @@
 var _numItems;
-var col;
 var itemIdx = {}; // 全ての商品名と商品番号を記録する
+var col;
 
-window.onload = function(){
-    // スクリーンサイズによって表示する商品の列数を変更する
-    if (screen.width > 900) {
-        col = 3.0;
-    } else if (screen.width < 900 && screen.width > 600) {
-        col = 2.0;
-    } else {
-        col = 1.0;
+// URLパラメータから表示する商品番号を抽出する
+var searchedItems = window.location.search.substring(1,window.location.search.length);
+searchedItems = searchedItems.split(',');
+console.log("search item idx : " + searchedItems);
+
+if (searchedItems == "") {
+    window.onload = function() {
+        console.log("nothing");
+        message = document.createElement("h3");
+        message.textContent = "お探しの商品は見つかりませんでした．";
+        message.style.textAlign = "center";
+        document.body.appendChild(message);
     }
 
-    // 出品されている商品数を取得する
-    contract.methods.numItems().call()
-    .then(function(numItems) {
-        _numItems = numItems;
-        console.log("numItems is " + _numItems);
-    
-    // DOMの作成
-    }).then(function() {
+} else {
+    window.onload = function() {
+        // スクリーンサイズによって表示する商品の列数を変更する
+        if (screen.width > 900) {
+            col = 3.0;
+        } else if (screen.width < 900 && screen.width > 600) {
+            col = 2.0;
+        } else {
+            col = 1.0;
+        }
+        
+        // DOMの作成
         var rows = [];
         var table = document.getElementById("table");
-        var row = Math.ceil(_numItems / col);
-        var idx = 0;
+        var row = Math.ceil(searchedItems.length / col);
+        var k = 0;
         for (i = 0; i < row; i++) {
             rows.push(table.insertRow(-1)); // 行の追加
             for (j = 0; j < col; j++) {
                 cell = rows[i].insertCell(-1);
 
-                if (idx < _numItems) {
+                if (i < searchedItems.length) {
+                    idx = Number(searchedItems[k]);
+
                     // 商品の説明と画像を表示するDOMを作成
                     var name = document.createElement("a");          // 商品名
                     var description = document.createElement("div"); // 商品説明
                     var image = document.createElement("a");         // 商品画像
-                    
+                        
                     name.id = "name" + idx;
                     name.href = "item.html?" + idx;
-
                     description.id = "description" + idx;
 
                     image.id = "image" + idx;
@@ -49,19 +58,38 @@ window.onload = function(){
                     cell.style.textAlign = "center";
                     // cell.style.border = "outset";
                     // cell.style.width = "300px";
-                    
-                    idx++;
+                        
+                    k++;
                 }
             }
         }
         // document.body.appendChild(table);
         console.log("create DOM");
-    
-    // DOMに商品情報を入れる
-    }).then(function() {
-        for (idx = 0; idx < _numItems; idx++) {
-            showItem(idx)
+        
+        // DOMに商品情報を入れる
+        for (var idx of searchedItems) {
+            idx = Number(idx);
+            showItem(idx);
         }
+
+        // 出品されている商品数を取得する
+        contract.methods.numItems().call()
+        .then(function(numItems) {
+            _numItems = numItems;
+            console.log("numItems is " + _numItems);
+
+        // 全ての商品名と商品番号を記録する
+        }).then(function() {
+            for (idx = 0; idx < _numItems; idx++) {
+                getItemIdx(idx);
+            }
+        });
+    }
+}
+
+function getItemIdx(idx) {
+    contract.methods.items(idx).call().then(function(item) {
+        itemIdx[item[3]] = idx;
     });
 }
 
@@ -93,7 +121,6 @@ function showItem(idx) {
             } else {
                 var elem = document.createElement("h6");
                 elem.textContent = item[i];
-                itemIdx[item[i]] = idx;
                 document.getElementById("name" + idx).appendChild(elem);
             }
         }
