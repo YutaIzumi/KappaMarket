@@ -1,25 +1,230 @@
 pragma solidity ^0.4.25;
 
-contract KappaMarket {
+contract EthereumMarket {
 
-    address owner;        // ƒRƒ“ƒgƒ‰ƒNƒgƒI[ƒi[‚ÌƒAƒhƒŒƒX
-    address donation;     // ƒ†ƒjƒZƒt‚ÌƒAƒhƒŒƒX 
-    uint public numItems; // ¤•i”
-    bool public stopped;  // true‚Ìê‡Circuit Breaker‚ª”­“®‚µC‘S‚Ä‚ÌƒRƒ“ƒgƒ‰ƒNƒg‚ªg—p•s‰Â”\‚É‚È‚é
+    address owner;        // ã‚³ãƒ³ãƒˆãƒ©ã‚¯ãƒˆã‚ªãƒ¼ãƒŠãƒ¼ã®ã‚¢ãƒ‰ãƒ¬ã‚¹
+    uint public numItems; // å•†å“æ•°
+    bool public stopped;  // trueã®å ´åˆCircuit BreakerãŒç™ºå‹•ã—ï¼Œå…¨ã¦ã®ã‚³ãƒ³ãƒˆãƒ©ã‚¯ãƒˆãŒä½¿ç”¨ä¸å¯èƒ½ã«ãªã‚‹
 
-    // ƒRƒ“ƒXƒgƒ‰ƒNƒ^
+    // ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿
     constructor() public {
-        owner = msg.sender;
-        // ƒ†ƒjƒZƒt‚ÌƒAƒhƒŒƒX
-        // http://helpdesk.unicef.org.nz/knowledge_base/topics/donate-to-unicef-via-cryptocurrencies
-        donation = 0xB9407f0033DcA85ac48126a53E1997fFdE04B746;
+        owner = msg.sender; // ã‚³ãƒ³ãƒˆãƒ©ã‚¯ãƒˆã‚’ãƒ‡ãƒ—ãƒ­ã‚¤ã—ãŸã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ã‚ªãƒ¼ãƒŠãƒ¼ã«æŒ‡å®šã™ã‚‹
+        numItems = 0;
+        stopped = false;
     }
 
-    // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªƒRƒ“ƒgƒ‰ƒNƒg‚ÌƒI[ƒi[‚©Šm”F
+    // å‘¼ã³å‡ºã—ãŒã‚³ãƒ³ãƒˆãƒ©ã‚¯ãƒˆã®ã‚ªãƒ¼ãƒŠãƒ¼ã‹ç¢ºèª
     modifier onlyOwner {
         require(msg.sender == owner);
         _;
     }
+
+    // å‘¼ã³å‡ºã—ãŒã‚¢ã‚«ã‚¦ãƒ³ãƒˆç™»éŒ²æ¸ˆã¿ã®Ethã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ç¢ºèª
+    modifier onlyUser {
+        require(accounts[msg.sender].resistered);
+        _;
+    }
+
+    // ===========================
+    // å–å¼•ã‚’è¡Œã†ãŸã‚ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¨é–¢æ•°
+    // ===========================
+
+    // ã‚¢ã‚«ã‚¦ãƒ³ãƒˆæƒ…å ±
+    struct account {
+        string name;          // åå‰
+        string email;         // emailã‚¢ãƒ‰ãƒ¬ã‚¹
+        uint numTransactions; // å–å¼•å›æ•°
+        int reputations;      // å–å¼•è©•ä¾¡, å¤§ãã„å€¤ã»ã©è‰¯ã„ã‚¢ã‚«ã‚¦ãƒ³ãƒˆ
+        bool resistered;      // ã‚¢ã‚«ã‚¦ãƒ³ãƒˆæœªç™»éŒ²:false, ç™»éŒ²æ¸ˆã¿:true
+        int numSell;          // å‡ºå“ã—ãŸå•†å“ã®æ•°
+        int numBuy;           // è³¼å…¥ã—ãŸå•†å“ã®æ•°
+    }
+    mapping(address => account) public accounts;
+
+    // å„ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒå‡ºå“ï¼Œè³¼å…¥ã—ãŸå•†å“ç•ªå·
+    // æœ¬æ¥ã¯å„ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒå‡ºå“ï¼Œè³¼å…¥ã—ãŸå•†å“ç•ªå·ã¯accountã®ãƒ¡ãƒ³ãƒã«ã™ã‚‹ã¹ãã§ã™ãŒï¼Œ
+    // solidityã®æ§‹é€ ä½“ã¯é…åˆ—ã‚’ãƒ¡ãƒ³ãƒã«ã™ã‚‹ã“ã¨ãŒã§ãã¾ã›ã‚“ï¼
+    // ãã“ã§ï¼Œæ–°ãŸã«ã“ã‚Œã‚‰ã‚’è¨˜éŒ²ã™ã‚‹ãƒ‡ãƒ¼ã‚¿æ§‹é€ ä½“ã‚’å®£è¨€ã—ã¦ã„ã¾ã™ï¼
+    mapping(address => uint[]) public sellItems;
+    mapping(address => uint[]) public buyItems;
+
+    // ã‚¢ã‚«ã‚¦ãƒ³ãƒˆç™»éŒ²ã™ã‚‹é–¢æ•°
+    function registerAccount(string _name, string _email) public isStopped {
+        require(!accounts[msg.sender].resistered); // æœªç™»éŒ²ã®Ethã‚¢ãƒ‰ãƒ¬ã‚¹ã‹ç¢ºèª
+
+	accounts[msg.sender].resistered = true;
+        accounts[msg.sender].name = _name;   // åå‰
+        accounts[msg.sender].email = _email; // emailã‚¢ãƒ‰ãƒ¬ã‚¹
+    }
+
+    // å•†å“æƒ…å ±
+    struct item {
+        address sellerAddr;  // å‡ºå“è€…ã®Ethã‚¢ãƒ‰ãƒ¬ã‚¹
+        address buyerAddr;   // è³¼å…¥è€…ã®Ethã‚¢ãƒ‰ãƒ¬ã‚¹
+        string seller;       // å‡ºå“è€…å
+        string name;         // å•†å“å
+        string description;  // å•†å“èª¬æ˜
+        uint price;          // ä¾¡æ ¼(å˜ä½ï¼šwei)
+        bool payment;        // false:æœªæ”¯æ‰•ã„, true:æ”¯æ‰•æ¸ˆã¿
+        bool shipment;       // false:æœªç™ºé€, true:ç™ºé€æ¸ˆã¿
+        bool receivement;    // false:æœªå—å–ã‚Š, true:å—å–æ¸ˆã¿
+        bool sellerReputate; // å‡ºå“è€…ã®è©•ä¾¡å®Œäº†ã‚¹ãƒ†ãƒ¼ãƒˆ, false:æœªè©•ä¾¡, true:è©•ä¾¡æ¸ˆã¿
+        bool buyerReputate;  // è³¼å…¥è€…ã®è©•ä¾¡å®Œäº†ã‚¹ãƒ†ãƒ¼ãƒˆ, false:æœªè©•ä¾¡, true:è©•ä¾¡æ¸ˆã¿
+        bool stopSell;       // false:å‡ºå“ä¸­, true:å‡ºå“å–æ¶ˆã—
+    }
+    mapping(uint => item) public items;
+
+    // å•†å“ç”»åƒã®åœ¨ã‚Šå‡¦
+    // solidityã®æ§‹é€ ä½“ã¯12å€‹ã¾ã§ã—ã‹ãƒ¡ãƒ³ãƒã‚’æŒã¦ãªã„ã®ã§ï¼Œå•†å“ç”»åƒã®åœ¨ã‚Šå‡¦ã¯itemã®ãƒ¡ãƒ³ãƒã«ã™ã‚‹ã“ã¨ãŒã§ãã¾ã›ã‚“ï¼
+    // ãã“ã§ï¼Œæ–°ãŸã«imagesã¨ã„ã†ãƒ‡ãƒ¼ã‚¿æ§‹é€ ä½“ã‚’ä½œæˆã—ã¾ã™ï¼
+    struct image {
+        string googleDocID; // googleãƒ‰ãƒ©ã‚¤ãƒ–ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®id
+        string ipfsHash;    // IPFSã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒã‚·ãƒ¥
+    }
+    mapping(uint => image) public images;
+
+    // å‡ºå“ã™ã‚‹é–¢æ•°
+    function sell(string _name, string _description, uint _price, string _googleDocID, string _ipfsHash) public onlyUser isStopped {
+        items[numItems].sellerAddr = msg.sender;            // å‡ºå“è€…ã®Ethã‚¢ãƒ‰ãƒ¬ã‚¹
+        items[numItems].seller = accounts[msg.sender].name; // å‡ºå“è€…å
+        items[numItems].name = _name;                       // å•†å“å
+        items[numItems].description = _description;         // å•†å“èª¬æ˜
+        items[numItems].price = _price;                     // å•†å“ä¾¡æ ¼
+        images[numItems].googleDocID = _googleDocID;        // googleãƒ‰ãƒ©ã‚¤ãƒ–ã®ãƒ•ã‚¡ã‚¤ãƒ«id
+        images[numItems].ipfsHash = _ipfsHash;              // IPFSã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒã‚·ãƒ¥
+        accounts[msg.sender].numSell++;                     // å„ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒå‡ºå“ã—ãŸå•†å“æ•°ã®æ›´æ–°
+        sellItems[msg.sender].push(numItems);               // å„ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒå‡ºå“ã—ãŸå•†å“ã®ç•ªå·ã‚’è¨˜éŒ²
+        numItems++;                                         // å‡ºå“ã•ã‚Œã¦ã„ã‚‹å•†å“æ•°ã‚’ï¼‘ã¤å¢—ã‚„ã™
+    }
+
+    // è³¼å…¥ã™ã‚‹é–¢æ•°
+    // ä»£é‡‘ã¯è³¼å…¥è€…ãŒå•†å“ã‚’å—å–ã‚‹ã¾ã§ã‚³ãƒ³ãƒˆãƒ©ã‚¯ãƒˆã«é ã‘ã‚‰ã‚Œã¾ã™
+    function buy(uint _numItems) public payable onlyUser isStopped {
+        require(!items[_numItems].payment);           // å•†å“ãŒå£²ã‚Šåˆ‡ã‚Œã¦ã„ãªã„ã‹ç¢ºèª
+        require(!items[_numItems].stopSell);          // å‡ºå“å–æ¶ˆã—ã«ãªã£ã¦ã„ãªã„ã‹ç¢ºèª
+        require(items[_numItems].price == msg.value); // å…¥é‡‘é‡‘é¡ãŒå•†å“ä¾¡æ ¼ã¨ä¸€è‡´ã—ã¦ã„ã‚‹ã‹ç¢ºèª
+
+        items[_numItems].payment = true;         // æ”¯æ‰•æ¸ˆã¿ã«ã™ã‚‹
+        items[_numItems].stopSell = true;        // å£²ã‚ŒãŸã®ã§å‡ºå“ã‚’ã‚¹ãƒˆãƒƒãƒ—ã™ã‚‹
+	items[_numItems].buyerAddr = msg.sender; // è³¼å…¥è€…ã®Ethã‚¢ãƒ‰ãƒ¬ã‚¹ã‚’ç™»éŒ²ã™ã‚‹
+        accounts[msg.sender].numBuy++;           // å„ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒè³¼å…¥ã—ãŸå•†å“æ•°ã®æ›´æ–°
+        buyItems[msg.sender].push(_numItems);    // å„ã‚¢ã‚«ã‚¦ãƒ³ãƒˆãŒè³¼å…¥ã—ãŸå•†å“ã®ç•ªå·ã‚’è¨˜éŒ²
+    }
+
+    // ç™ºé€å®Œäº†ã‚’é€šçŸ¥ã™ã‚‹é–¢æ•°
+    function ship(uint _numItems) public onlyUser isStopped {
+        require(items[_numItems].sellerAddr == msg.sender); // å‘¼ã³å‡ºã—ãŒå‡ºå“è€…ã‹ç¢ºèª
+        require(items[_numItems].payment);   // å…¥é‡‘æ¸ˆã¿å•†å“ã‹ç¢ºèª
+        require(!items[_numItems].shipment); // æœªç™ºé€ã®å•†å“ã‹ç¢ºèª
+
+        items[_numItems].shipment = true;    // ç™ºé€æ¸ˆã¿ã«ã™ã‚‹
+    }
+
+    // å•†å“å—å–ã®é€šçŸ¥ã¨å‡ºå“è€…ã¸ä»£é‡‘ã‚’é€é‡‘ã™ã‚‹é–¢æ•°
+    function receive(uint _numItems) public payable onlyUser isStopped {
+        require(items[_numItems].buyerAddr == msg.sender); // å‘¼ã³å‡ºã—ãŒè³¼å…¥è€…ã‹ç¢ºèª
+        require(items[_numItems].shipment);     // ç™ºé€æ¸ˆã¿å•†å“ã‹ç¢ºèª
+        require(!items[_numItems].receivement); // å—å–å‰ã®å•†å“ã‹ç¢ºèª
+		
+        items[_numItems].receivement = true; 	// å—å–æ¸ˆã¿ã«ã™ã‚‹
+        // å—å–ã‚ŠãŒå®Œäº†ã—ãŸã‚‰å‡ºå“è€…ã«ä»£é‡‘ã‚’é€é‡‘ã™ã‚‹
+        items[_numItems].sellerAddr.transfer(items[_numItems].price);
+    }
+	
+    // å–å¼•è©•ä¾¡ã‚’è¡Œã†
+    // è³¼å…¥è€…ãŒå‡ºå“è€…ã‚’è©•ä¾¡ã™ã‚‹é–¢æ•°
+    function sellerEvaluate(uint _numItems, int _reputate) public onlyUser isStopped {
+        require(items[_numItems].buyerAddr == msg.sender); // å‘¼ã³å‡ºã—ãŒè³¼å…¥è€…ã‹ç¢ºèª
+        require(items[_numItems].receivement);             // å•†å“ã®å—å–ãŒå®Œäº†ã—ã¦ã„ã‚‹ã“ã¨ã‚’ç¢ºèª
+        require(_reputate >= -2 && _reputate <= 2);        // è©•ä¾¡ã¯-2 ~ +2ã®ç¯„å›²ã§è¡Œã†
+        require(!items[_numItems].sellerReputate);         // å‡ºå“è€…ã®è©•ä¾¡ãŒå®Œäº†ã‚’ã—ã¦ã„ãªã„ã“ã¨ã‚’ç¢ºèª
+
+	items[_numItems].sellerReputate = true;                         // è©•ä¾¡æ¸ˆã¿ã«ã™ã‚‹
+        accounts[items[_numItems].sellerAddr].numTransactions++;        // å‡ºå“è€…ã®å–å¼•å›æ•°ã®åŠ ç®—
+        accounts[items[_numItems].sellerAddr].reputations += _reputate; // å‡ºå“è€…ã®è©•ä¾¡ã®æ›´æ–°
+    }
+
+    // å‡ºå“è€…ãŒè³¼å…¥è€…ã‚’è©•ä¾¡ã™ã‚‹é–¢æ•°
+    function buyerEvaluate(uint _numItems, int _reputate) public onlyUser isStopped {
+        require(items[_numItems].sellerAddr == msg.sender); // å‘¼ã³å‡ºã—ãŒå‡ºå“è€…ã‹ç¢ºèª
+        require(items[_numItems].receivement);              // å•†å“ã®å—å–ãŒå®Œäº†ã—ã¦ã„ã‚‹ã“ã¨ã‚’ç¢ºèª
+        require(_reputate >= -2 && _reputate <= 2);         // è©•ä¾¡ã¯-2 ~ +2ã®ç¯„å›²ã§è¡Œã†
+        require(!items[_numItems].buyerReputate);           // è³¼å…¥è€…ã®è©•ä¾¡ãŒå®Œäº†ã‚’ã—ã¦ã„ãªã„ã“ã¨ã‚’ç¢ºèª
+
+	items[_numItems].buyerReputate = true;                         // è©•ä¾¡æ¸ˆã¿ã«ã™ã‚‹
+        accounts[items[_numItems].buyerAddr].numTransactions++;        // è³¼å…¥è€…ã®å–å¼•å›æ•°ã®åŠ ç®—
+        accounts[items[_numItems].buyerAddr].reputations += _reputate; // è³¼å…¥è€…ã®è©•ä¾¡ã®æ›´æ–°
+    }
+
+    // ===============================
+    // ä¾‹å¤–å‡¦ç†ã‚’è¡Œã†ãŸã‚ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¨é–¢æ•°
+    // ===============================
+
+    // ã‚¢ã‚«ã‚¦ãƒ³ãƒˆæƒ…å ±ã‚’ä¿®æ­£ã™ã‚‹é–¢æ•°
+    function modifyAccount(string _name, string _email) public onlyUser isStopped {
+        accounts[msg.sender].name = _name;   // åå‰
+        accounts[msg.sender].email = _email; // emailã‚¢ãƒ‰ãƒ¬ã‚¹
+    }
+    
+    // å‡ºå“å†…å®¹ã‚’å¤‰æ›´ã™ã‚‹é–¢æ•°
+    function modifyItem(uint _numItems, string _name, string _description, uint _price, string _googleDocID, string _IPFSHash) public onlyUser isStopped {
+        require(items[_numItems].sellerAddr == msg.sender);  // ã‚³ãƒ³ãƒˆãƒ©ã‚¯ãƒˆã®å‘¼ã³å‡ºã—ãŒå‡ºå“è€…ã‹ç¢ºèª
+        require(!items[_numItems].payment);                  // è³¼å…¥ã•ã‚Œã¦ã„ãªã„å•†å“ã‹ç¢ºèª
+        require(!items[_numItems].stopSell);                 // å‡ºå“ä¸­ã®å•†å“ã‹ç¢ºèª
+
+        items[_numItems].seller = accounts[msg.sender].name; // å‡ºå“è€…å
+        items[_numItems].name = _name;                       // å•†å“å
+        items[_numItems].description = _description;         // å•†å“èª¬æ˜
+        items[_numItems].price = _price;                     // å•†å“ä¾¡æ ¼
+        images[_numItems].googleDocID = _googleDocID;        // googleãƒ‰ãƒ©ã‚¤ãƒ–ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®id
+        images[_numItems].ipfsHash = _IPFSHash;              // IPFSã®ãƒ•ã‚¡ã‚¤ãƒ«ãƒãƒƒã‚·ãƒ¥
+    }
+
+    // å‡ºå“ã‚’å–ã‚Šæ¶ˆã™é–¢æ•°ï¼ˆå‡ºå“è€…ï¼‰
+    function sellerStop(uint _numItems) public onlyUser isStopped {
+        require(items[_numItems].sellerAddr == msg.sender); // å‘¼ã³å‡ºã—ãŒå‡ºå“è€…ã‹ç¢ºèª
+        require(!items[_numItems].stopSell);                // å‡ºå“ä¸­ã®å•†å“ã‹ç¢ºèª
+        require(!items[_numItems].payment);                 // è³¼å…¥ã•ã‚Œã¦ã„ãªã„å•†å“ã‹ç¢ºèª
+
+        items[_numItems].stopSell = true; // å‡ºå“ã®å–æ¶ˆã—
+    }
+
+    // å‡ºå“ã‚’å–ã‚Šæ¶ˆã™é–¢æ•°ï¼ˆã‚ªãƒ¼ãƒŠãƒ¼ï¼‰
+    function ownerStop(uint _numItems) public onlyOwner isStopped {
+        require(!items[_numItems].stopSell); // å‡ºå“ä¸­ã®å•†å“ã‹ç¢ºèª
+        require(!items[_numItems].payment);  // è³¼å…¥ã•ã‚Œã¦ã„ãªã„å•†å“ã‹ç¢ºèª
+
+        items[_numItems].stopSell = true; // å‡ºå“ã®å–æ¶ˆã—
+    }
+
+    // è¿”é‡‘ã™ã‚‹éš›ã«å‚ç…§ã™ã‚‹ã‚¹ãƒ†ãƒ¼ãƒˆ
+    mapping(uint => bool) public refundFlags; // è¿”é‡‘ã™ã‚‹ã¨ï¼Œfalseã‹ã‚‰trueã«å¤‰ã‚ã‚‹
+
+    // è³¼å…¥è€…ã¸è¿”é‡‘ã™ã‚‹é–¢æ•°ï¼ˆå‡ºå“è€…ï¼‰
+    // å•†å“ã‚’ç™ºé€ã§ããªããªã£ãŸæ™‚ã«ä½¿ç”¨ã™ã‚‹
+    function refundFromSeller(uint _numItems) public payable onlyUser isStopped {
+        require(msg.sender == items[_numItems].sellerAddr); // å‘¼ã³å‡ºã—ãŒå‡ºå“è€…ã‹ç¢ºèª
+        require(items[_numItems].payment);                  // å…¥é‡‘æ¸ˆã¿å•†å“ã‹ç¢ºèª
+        require(!items[_numItems].receivement);             // å‡ºå“è€…ãŒä»£é‡‘ã‚’å—å–ã‚‹å‰ã‹ç¢ºèª
+        require(!refundFlags[_numItems]);                   // æ—¢ã«è¿”é‡‘ã•ã‚ŒãŸå•†å“ã§ã¯ãªã„ã‹ç¢ºèª
+
+        refundFlags[_numItems] = true; // è¿”é‡‘æ¸ˆã¿ã«ã™ã‚‹
+        items[_numItems].buyerAddr.transfer(items[_numItems].price); // è³¼å…¥è€…ã¸è¿”é‡‘
+    }
+
+    // è³¼å…¥è€…ã¸è¿”é‡‘ã™ã‚‹é–¢æ•°ï¼ˆã‚ªãƒ¼ãƒŠãƒ¼ï¼‰
+    function refundFromOwner(uint _numItems) public payable onlyOwner isStopped {
+        require(items[_numItems].payment);      // å…¥é‡‘æ¸ˆã¿å•†å“ã‹ç¢ºèª
+        require(!items[_numItems].receivement); // å‡ºå“è€…ãŒä»£é‡‘ã‚’å—å–ã‚‹å‰ã‹ç¢ºèª
+        require(!refundFlags[_numItems]);       // æ—¢ã«è¿”é‡‘ã•ã‚ŒãŸå•†å“ã§ã¯ãªã„ã‹ç¢ºèª
+
+        refundFlags[_numItems] = true; // è¿”é‡‘æ¸ˆã¿ã«ã™ã‚‹
+        items[_numItems].buyerAddr.transfer(items[_numItems].price); // è³¼å…¥è€…ã¸è¿”é‡‘
+    }
+
+    // ================
+    // ã‚»ã‚­ãƒ¥ãƒªãƒ†ã‚£ãƒ¼å¯¾ç­–
+    // ================
 
     // Circuit Breaker
     modifier isStopped {
@@ -27,212 +232,13 @@ contract KappaMarket {
         _;
     }
     
-    // Circuit Breaker‚ğ”­“®C’â~‚·‚éŠÖ”
+    // Circuit Breakerã‚’ç™ºå‹•ï¼Œåœæ­¢ã™ã‚‹é–¢æ•°
     function toggleCircuit(bool _stopped) public onlyOwner {
         stopped = _stopped;
     }
 
-    // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªƒAƒJƒEƒ“ƒgî•ñ“o˜^Ï‚İƒ†[ƒU[‚©Šm”F
-    modifier onlyUser {
-        require(accounts[msg.sender].resistered);
-        _;
-    }
-
-    // ¤•iî•ñ
-    struct item {
-        address sellerAddr;  // o•iÒ‚ÌethƒAƒhƒŒƒX
-        address buyerAddr;   // w“üÒ‚ÌethƒAƒhƒŒƒX
-        string seller;       // o•iÒ–¼
-        string name;         // ¤•i–¼
-        string description;  // ¤•ià–¾
-        uint price;          // ‰¿Ši
-        bool payment;        // false:–¢x•¥‚¢, true:x•¥Ï‚İ
-        bool shipment;       // false:–¢”­‘—, true:”­‘—Ï‚İ
-        bool receivement;    // false:–¢óæ‚è, true:óæÏ‚İ
-        bool sellerReputate; // o•iÒ‚Ì•]‰¿Š®—¹ƒtƒ‰ƒO, false:–¢•]‰¿, true:•]‰¿Ï‚İ
-        bool buyerReputate;  // w“üÒ‚Ì•]‰¿Š®—¹ƒtƒ‰ƒO, false:–¢•]‰¿, true:•]‰¿Ï‚İ
-        bool stopSell;       // false:o•i’†, true:o•iæÁ‚µ
-    }
-    mapping(uint => item) public items;
-
-    // ¤•i‰æ‘œ‚Ìİ‚èˆ
-    // ¤•i‰æ‘œ‚Ígoogleƒhƒ‰ƒCƒu‚©IPFS‚É•Û‘¶‚·‚é
-    struct image {
-        string googleDocID; // ƒtƒ@ƒCƒ‹‚Ìid
-        string ipfsHash;    // ƒtƒ@ƒCƒ‹‚ÌƒnƒbƒVƒ…
-    }
-    mapping(uint => image) public images;
-
-    // ƒAƒJƒEƒ“ƒgî•ñ
-    struct account {
-        string name;          // –¼‘O
-        string email;         // emailƒAƒhƒŒƒX
-        uint numTransactions; // æˆø‰ñ”
-        int reputations;      // æˆø•]‰¿, ‘å‚«‚¢’l‚Ù‚Ç—Ç‚¢ƒ†[ƒU[
-        bool resistered;      // ƒAƒJƒEƒ“ƒg–¢“o˜^:false, “o˜^Ï‚İ:true
-        int numSell;          // o•i‚µ‚½¤•i‚Ì”
-        int numBuy;           // w“ü‚µ‚½¤•i‚Ì”
-    }
-    mapping(address => account) public accounts;
-
-    // Šeƒ†[ƒU[‚ªo•i‚µ‚½¤•i‚Ì”Ô†‚ğ‹L˜^‚·‚é”z—ñ
-    mapping(address => uint[]) public sellItems;
-
-    // Šeƒ†[ƒU[‚ªw“ü‚µ‚½¤•i‚Ì”Ô†‚ğ‹L˜^‚·‚é”z—ñ
-    mapping(address => uint[]) public buyItems;
-    
-    // •Ô‹à‚·‚éÛ‚ÉQÆ‚·‚éƒtƒ‰ƒO
-    mapping(uint => bool) public refundFlags; // •Ô‹à‚·‚é‚ÆCfalse‚©‚çtrue‚É•Ï‚í‚é
-
-    // ƒAƒJƒEƒ“ƒgî•ñ‚ğ“o˜^‚·‚éŠÖ”
-    function registerAccount(string _name, string _email) public isStopped {
-        require(!accounts[msg.sender].resistered); // –¢“o˜^‚ÌethƒAƒhƒŒƒX‚©Šm”F
-
-        accounts[msg.sender].name = _name;   // –¼‘O
-        accounts[msg.sender].email = _email; // emailƒAƒhƒŒƒX
-        accounts[msg.sender].resistered = true;
-    }
-
-    // ƒAƒJƒEƒ“ƒgî•ñ‚ğC³‚·‚éŠÖ”
-    function modifyAccount(string _name, string _email) public onlyUser isStopped {
-        accounts[msg.sender].name = _name;   // –¼‘O
-        accounts[msg.sender].email = _email; // emailƒAƒhƒŒƒX
-    }
-
-    // o•i‚·‚éŠÖ”
-    function sell(string _name, string _description, uint _price, string _googleDocID, string _ipfsHash) public onlyUser isStopped {
-        items[numItems].sellerAddr = msg.sender;            // o•iÒ‚ÌethƒAƒhƒŒƒX
-        items[numItems].seller = accounts[msg.sender].name; // o•iÒ–¼
-        items[numItems].name = _name;                       // ¤•i–¼
-        items[numItems].description = _description;         // ¤•ià–¾
-        items[numItems].price = _price;                     // ¤•i‰¿Ši
-        images[numItems].googleDocID = _googleDocID;        // ƒtƒ@ƒCƒ‹‚Ìid
-        images[numItems].ipfsHash = _ipfsHash;              // ƒtƒ@ƒCƒ‹‚ÌƒnƒbƒVƒ…
-        accounts[msg.sender].numSell++;                     // o•i‚µ‚½¤•i”‚ÌXV
-        sellItems[msg.sender].push(numItems);               // Šeƒ†[ƒU[‚ªw“ü‚µ‚½¤•i‚Ì”Ô†‚ğ‹L˜^
-        numItems++;
-    }
-
-    // o•i“à—e‚ğ•ÏX‚·‚éŠÖ”
-    function modifyItem(uint _numItems, string _name, string _description, uint _price, string _googleDocID, string _IPFSHash) public onlyUser isStopped {
-        require(items[_numItems].sellerAddr == msg.sender);  // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªo•iÒ‚©Šm”F
-        require(!items[_numItems].payment);                  // w“ü‚³‚ê‚Ä‚¢‚È‚¢¤•i‚©Šm”F
-        require(!items[_numItems].stopSell);                 // o•i’†‚Ì¤•i‚©Šm”F
-
-        items[_numItems].seller = accounts[msg.sender].name; // o•iÒ–¼
-        items[_numItems].name = _name;                       // ¤•i–¼
-        items[_numItems].description = _description;         // ¤•ià–¾
-        items[_numItems].price = _price;                     // ¤•i‰¿Ši
-        images[numItems].googleDocID = _googleDocID;         // ƒtƒ@ƒCƒ‹‚Ìid
-        images[numItems].ipfsHash = _IPFSHash;               // ƒtƒ@ƒCƒ‹‚ÌƒnƒbƒVƒ…
-    }
-
-    // w“ü‚·‚éŠÖ”
-    function buy(uint _numItems) public payable onlyUser isStopped {
-        require(_numItems < numItems);                // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(!items[_numItems].payment);           // ¤•i‚ª”„‚èØ‚ê‚Ä‚¢‚È‚¢‚©Šm”F
-        require(!items[_numItems].stopSell);          // o•iæÁ‚µ‚É‚È‚Á‚Ä‚¢‚È‚¢‚©Šm”F
-        require(items[_numItems].price == msg.value); // “ü‹à‹àŠz‚ª¤•i‰¿Ši‚Æˆê’v‚µ‚Ä‚¢‚é‚©Šm”F
-
-        items[_numItems].buyerAddr = msg.sender; // w“üÒ‚ÌethƒAƒhƒŒƒX
-        items[_numItems].payment = true;         // x•¥Ï‚İ‚É‚·‚é
-        items[_numItems].stopSell = true;        // ”„‚ê‚½‚Ì‚Åo•i‚ğƒXƒgƒbƒv‚·‚é
-        accounts[msg.sender].numBuy++;           // w“ü‚µ‚½¤•i”‚ÌXV
-        buyItems[msg.sender].push(_numItems);    // Šeƒ†[ƒU[‚ªw“ü‚µ‚½¤•i‚Ì”Ô†‚ğ‹L˜^
-    }
-
-    // ”­‘—Š®—¹‚ÉŒÄ‚Ño‚³‚ê‚éŠÖ”
-    function ship(uint _numItems) public onlyUser isStopped {
-        require(items[_numItems].sellerAddr == msg.sender); // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªo•iÒ‚©Šm”F
-        require(_numItems < numItems);       // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(items[_numItems].payment);   // “ü‹àÏ‚İ¤•i‚©Šm”F
-        require(!items[_numItems].shipment); // –¢”­‘—‚Ì¤•i‚©Šm”F
-
-        items[_numItems].shipment = true;  // ”­‘—Ï‚İ‚É‚·‚é
-    }
-
-    // ¤•ióæ‚è‚ÉŒÄ‚Ño‚³‚ê‚éŠÖ”
-    function receive(uint _numItems) public payable onlyUser isStopped {
-        require(items[_numItems].buyerAddr == msg.sender); // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªw“üÒ‚©Šm”F
-        require(_numItems < numItems);          // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(items[_numItems].shipment);     // ”­‘—Ï‚İ¤•i‚©Šm”F
-        require(!items[_numItems].receivement); // óæ‘O‚Ì¤•i‚©Šm”F
-
-        items[_numItems].receivement = true;
-        // óæ‚è‚ªŠ®—¹‚µ‚½‚ço•iÒ‚Æƒ†ƒjƒZƒt‚Éeth‚ğ‘—‹à‚·‚é
-        donation.transfer(items[_numItems].price * 1 / 20); // ”„ã‚Ì5%‚ğŠñ•t
-        items[_numItems].sellerAddr.transfer(items[_numItems].price * 19 / 20); // c‚è‚ğo•iÒ‚É‘—‹à‚·‚é
-    }
-
-    // w“üÒ‚ªo•iÒ‚ğ•]‰¿‚·‚éŠÖ”
-    function sellerEvaluate(uint _numItems, int _reputate) public onlyUser isStopped {
-        require(items[_numItems].buyerAddr == msg.sender); // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªw“üÒ‚©Šm”F
-        require(_numItems < numItems);                     // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(_reputate >= -2 && _reputate <= 2);        // •]‰¿‚Í-2 ~ +2‚Ì”ÍˆÍ‚Ås‚¤
-        require(!items[_numItems].sellerReputate);         // w“üÒ‚Ì•]‰¿‚ªŠ®—¹‚ğ‚µ‚Ä‚¢‚È‚¢‚±‚Æ‚ğŠm”F
-
-        accounts[items[_numItems].sellerAddr].numTransactions++;        // o•iÒ‚Ìæˆø‰ñ”‚Ì‰ÁZ
-        accounts[items[_numItems].sellerAddr].reputations += _reputate; // o•iÒ‚Ì•]‰¿‚ÌXV
-        items[_numItems].sellerReputate = true;                         // •]‰¿Ï‚İ‚É‚·‚é
-    }
-
-    // o•iÒ‚ªw“üÒ‚ğ•]‰¿‚·‚éŠÖ”
-    function buyerEvaluate(uint _numItems, int _reputate) public onlyUser isStopped {
-        require(items[_numItems].sellerAddr == msg.sender); // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªo•iÒ‚©Šm”F
-        require(_numItems < numItems);                      // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(_reputate >= -2 && _reputate <= 2);         // •]‰¿‚Í-2 ~ +2‚Ì”ÍˆÍ‚Ås‚¤
-        require(!items[_numItems].buyerReputate);           // w“üÒ‚Ì•]‰¿‚ªŠ®—¹‚ğ‚µ‚Ä‚¢‚È‚¢‚±‚Æ‚ğŠm”F
-
-        accounts[items[_numItems].buyerAddr].numTransactions++;        // w“üÒ‚Ìæˆø‰ñ”‚Ì‰ÁZ
-        accounts[items[_numItems].buyerAddr].reputations += _reputate; // w“üÒ‚Ì•]‰¿‚ÌXV
-        items[_numItems].buyerReputate = true;                         // •]‰¿Ï‚İ‚É‚·‚é
-    }
-
-    // o•i‚ğæ‚èÁ‚·ŠÖ”io•iÒj
-    function sellerStop(uint _numItems) public onlyUser isStopped {
-        require(items[_numItems].sellerAddr == msg.sender); // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªo•iÒ‚©Šm”F
-        require(_numItems < numItems);                      // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(!items[_numItems].stopSell);                // o•i’†‚Ì¤•i‚©Šm”F
-        require(!items[_numItems].payment);                 // w“ü‚³‚ê‚Ä‚¢‚È‚¢¤•i‚©Šm”F
-
-        items[_numItems].stopSell = true; // o•i‚ÌæÁ‚µ
-    }
-
-    // o•i‚ğæ‚èÁ‚·ŠÖ”iƒI[ƒi[j
-    function ownerStop(uint _numItems) public onlyOwner isStopped {
-        require(items[_numItems].sellerAddr == msg.sender); // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªo•iÒ‚©Šm”F
-        require(_numItems < numItems);                      // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(!items[_numItems].stopSell);                // o•i’†‚Ì¤•i‚©Šm”F
-        require(!items[_numItems].payment);                 // w“ü‚³‚ê‚Ä‚¢‚È‚¢¤•i‚©Šm”F
-
-        items[_numItems].stopSell = true;
-    }
-
-    // w“üÒ‚Ö•Ô‹à‚·‚éŠÖ”
-    // ¤•i‚ª“Í‚©‚È‚©‚Á‚½‚Ég—p‚·‚é
-    function ownerRefund(uint _numItems) public payable onlyOwner isStopped {
-        require(_numItems < numItems);          // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(items[_numItems].payment);      // “ü‹àÏ‚İ¤•i‚©Šm”F
-        require(!items[_numItems].receivement); // o•iÒ‚ª‘ã‹à‚ğóæ‚é‘O‚©Šm”F
-        require(!refundFlags[_numItems]);       // Šù‚É•Ô‹à‚µ‚Ä‚¢‚È‚¢‚©Šm”F
-
-        refundFlags[_numItems] = true; // •Ô‹àÏ‚İ‚É‚·‚é
-        items[_numItems].buyerAddr.transfer(items[_numItems].price); // w“üÒ‚Ö•Ô‹à
-    }
-
-    function sellerRefund(uint _numItems) public payable onlyUser isStopped {
-        require(_numItems < numItems);                      // ‘¶İ‚·‚é¤•i‚©Šm”F
-        require(msg.sender == items[_numItems].sellerAddr); // ƒRƒ“ƒgƒ‰ƒNƒg‚ÌŒÄ‚Ño‚µ‚ªo•iÒ‚©Šm”F
-        require(items[_numItems].payment);                  // “ü‹àÏ‚İ¤•i‚©Šm”F
-        require(!items[_numItems].receivement);             // o•iÒ‚ª‘ã‹à‚ğóæ‚é‘O‚©Šm”F
-        require(!refundFlags[_numItems]);                   // Šù‚É•Ô‹à‚µ‚Ä‚¢‚È‚¢‚©Šm”F
-
-        refundFlags[_numItems] = true; // •Ô‹àÏ‚İ‚É‚·‚é
-        items[_numItems].buyerAddr.transfer(items[_numItems].price); // w“üÒ‚Ö•Ô‹à
-    }
-
-    // ƒRƒ“ƒgƒ‰ƒNƒg‚ğ”jŠü‚µ‚ÄCc‹à‚ğƒI[ƒi[‚É‘—‚éŠÖ”
-    // ƒNƒ‰ƒbƒLƒ“ƒO‘Îô
+    // ã‚³ãƒ³ãƒˆãƒ©ã‚¯ãƒˆã‚’ç ´æ£„ã—ã¦ï¼Œæ®‹é‡‘ã‚’ã‚ªãƒ¼ãƒŠãƒ¼ã«é€ã‚‹é–¢æ•°
+    // ã‚¯ãƒ©ãƒƒã‚­ãƒ³ã‚°å¯¾ç­–
     function kill() public onlyOwner {
         selfdestruct(owner);
     }
