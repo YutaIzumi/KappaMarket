@@ -205,6 +205,7 @@ web3js.eth.getAccounts(function(err, accounts) {
 
 // 商品情報を表示する関数
 function showItem(numItem, idx) {
+    // numItem：商品番号，idx：DOMのインデックス
     // 商品説明
     itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
     itemIdxList = [3, 5, 4, 11, 2, 0, 1];

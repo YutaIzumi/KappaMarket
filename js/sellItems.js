@@ -1,5 +1,5 @@
-var _numBuy;  // 購入した商品数
-var _buyItem; // 購入した商品番号
+var _numSell;  // 購入した商品数
+var _sellItem; // 購入した商品番号
 var col;      // スクリーンサイズに応じて表示する列数を変更する
 var threshold = 750; // スクリーンサイズの閾値
 
@@ -251,6 +251,7 @@ web3js.eth.getAccounts(function(err, accounts) {
 
 // 商品情報を表示する関数
 function showItem(numItem, idx) {
+    // numItem：商品番号，idx：DOMのインデックス
     // 商品説明
     itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
     itemIdxList = [3, 5, 4, 11, 2, 0, 1];
@@ -370,7 +371,7 @@ function sellerStop(numItem) {
 
 // 返金する関数
 function refund(numItem) {
-    return contract.methods.sellerRefund(numItem)
+    return contract.methods.refundFromSeller(numItem)
     .send({ from: coinbase })
     .on("receipt", function(receipt) {
         console.log("success");

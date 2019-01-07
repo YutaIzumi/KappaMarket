@@ -94,7 +94,6 @@ function showItem(idx) {
             } else {
                 var elem = document.createElement("h6");
                 elem.textContent = item[i];
-                itemIdx[item[i]] = idx;
                 document.getElementById("name" + idx).appendChild(elem);
             }
         }
