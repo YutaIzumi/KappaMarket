@@ -49,6 +49,7 @@ web3js.eth.getAccounts(function(err, accounts) {
             for(j = 0; j < col; j++) {
                 cell = rows[i].insertCell(-1); // セルの追加
 
+                // 2列表示する場合
                 if (col == 2) {
                     // 1列目の表示内容
                     if (j == 0) {
@@ -110,6 +111,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                         cell.appendChild(sellerEvaluate);
                     }
 
+                // 1列表示する場合
                 } else {
                     // 商品の説明と画像を表示するDOMを作成
                     var image = document.createElement("a");
@@ -177,7 +179,7 @@ web3js.eth.getAccounts(function(err, accounts) {
     
     // DOMに中身を入れる
     }).then(function() {
-        var idx = 0;
+        var idx = 0; // DOMのインデックス
         for (i = 0; i < _numBuy; i++) {
             contract.methods.buyItems(coinbase, i).call()
             .then(function(buyItem) {
@@ -187,11 +189,13 @@ web3js.eth.getAccounts(function(err, accounts) {
                 console.log("idx " + idx);
                 console.log("_buyItem " + _buyItem);
                 
-                image = document.getElementById("image" + idx);
+                // 商品画像にリンクを張る
+                var image = document.getElementById("image" + idx);
+                image.href = "item.html?" + _buyItem;
+
+                // ボタンに関数を登録する
                 _receive = document.getElementById("receive" + idx);
                 _sellerEvaluate = document.getElementById("sellerEvaluate" + idx);
-
-                image.href = "item.html?" + _buyItem;
                 _receive.setAttribute("onclick", "receive(" + _buyItem + ");");
                 _sellerEvaluate.setAttribute("onclick", "sellerEvaluate(" + idx + "," + _buyItem + ");");
                 
