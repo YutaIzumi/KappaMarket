@@ -1,6 +1,6 @@
-var _numItems;
-var itemIdx = {}; // 全ての商品名と商品番号を記録する
-var col;
+var _numItems;    // 出品されている商品数
+var itemIdx = {}; // 全ての商品名と商品番号を記録する連想配列
+var col;          // 商品一覧表示の列数
 
 // URLパラメータから表示する商品番号を抽出する
 var searchedItems = window.location.search.substring(1,window.location.search.length);
@@ -31,7 +31,7 @@ if (searchedItems == "") {
 
 } else {
     window.onload = function() {
-        // スクリーンサイズによって表示する商品の列数を変更する
+        // スクリーンサイズによって商品一覧表示の列数を変更する
         if (screen.width > 900) {
             col = 3.0;
         } else if (screen.width < 900 && screen.width > 600) {
@@ -40,7 +40,7 @@ if (searchedItems == "") {
             col = 1.0;
         }
         
-        // DOMの作成
+        // DOMを作成する
         var rows = [];
         var table = document.getElementById("table");
         var row = Math.ceil(searchedItems.length / col);
@@ -58,10 +58,12 @@ if (searchedItems == "") {
                     var description = document.createElement("div"); // 商品説明
                     var image = document.createElement("a");         // 商品画像
                         
+                    // 商品名をクリックすると商品ページに移動する
                     name.id = "name" + idx;
                     name.href = "item.html?" + idx;
                     description.id = "description" + idx;
 
+                    // 商品画像をクリックすると商品ページに移動する
                     image.id = "image" + idx;
                     image.href = "item.html?" + idx;
 
@@ -100,13 +102,14 @@ if (searchedItems == "") {
     }
 }
 
+// 商品名と商品番号を記録する関数
 function getItemIdx(idx) {
     contract.methods.items(idx).call().then(function(item) {
         itemIdx[item[3]] = idx;
     });
 }
 
-// 商品一覧を表示する関数
+// 商品情報を表示する関数
 function showItem(idx) {
     console.log("showItem numItems = " + idx);
 
@@ -151,7 +154,7 @@ function showItem(idx) {
         img.src = imageUrl;
         img.alt = "ipfsImage" + idx;
 
-        // 画像の読込みを待ってから実行
+        // 画像の読込みを待ってから画像を加工する
         img.addEventListener("load", function() {
             // 画像のリサイズ
             var orgWidth  = img.width;

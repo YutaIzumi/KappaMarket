@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="UTF-8">
-  <title>Kappaマーケット</title>
+  <title>KappaMarket</title>
+  <!--表示するモニターサイズを端末（デバイス = device）ごとの横幅（width）に合わる-->
   <meta name="viewport" content="width=device-width">
-  <link rel="stylesheet" href="../css/bootstrap.css">
-  <script language="javascript" type="text/javascript" src="../js/web3.min.js"></script>
-  <script language="javascript" type="text/javascript" src="../js/KappaMarketAbi.js"></script>
-  <script type="text/javascript" src="../js/sellItems.js"></script>
-  <script type="text/javascript" src="../js/search.js"></script>
+  <!--bootstrapの読込み-->
+  <link rel="stylesheet" href="../css/bootstrap.min.css">
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
-  <style> 
+  <!--Web3.jsの読込み-->
+  <script language="javascript" type="text/javascript" src="../js/web3.min.js"></script>
+  <!--Abiの読込み-->
+  <script language="javascript" type="text/javascript" src="../js/KappaMarketAbi.js"></script>
+  <!--自作のJavaScriptの読込み-->
+  <script type="text/javascript" src="../js/check.js"></script>
+  <script type="text/javascript" src="../js/sellItems.js"></script>
+  <script type="text/javascript" src="../js/search.js"></script>
+
+  <!--記述内容は必要に応じて改行する-->
+  <style>
     td {
       /*word-break: break-all;*/
       /*overflow-wrap : break-word;*/
@@ -20,7 +29,9 @@
     }
   </style>
 </head>
+
 <header>
+  <!--ナビゲーションバーを配置する-->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
     <a class="navbar-brand" href="main.html">KappaMarket</a>
 
@@ -58,10 +69,13 @@
     </div>
   </nav>
 </header>
+
 <body>
   <div class="container-fluid">
     <p class="text-danger" style="text-align:center">※これはデモです．本当に売買はできません．このスマートコントラクトはRopstenテストネットワークで動作しています．</p>
+    <!--テーブルは中央寄せ，テーブルのセル幅を固定する-->
     <table id="table" class="table table" class="center-block" ~~~ style="table-layout:fixed;width:100%;"></table>
   </div>
 </body>
+
 </html>

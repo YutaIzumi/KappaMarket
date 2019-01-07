@@ -1,10 +1,9 @@
-// 出品する
+// 出品する関数
 function sell() {
     var itemName = document.getElementById("itemName").value;
     var description = document.getElementById("description").value;
     var price = document.getElementById("price").value;
-    // var googleID = document.getElementById("googleID").value;
-    var googleID = "";
+    var googleID = document.getElementById("googleID").value;
     var IPFSHash = document.getElementById("IPFSHash").value;
 
     return contract.methods.sell(itemName, description, price, googleID, IPFSHash)

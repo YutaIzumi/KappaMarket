@@ -1,5 +1,5 @@
-var _numItems;
-var col;
+var _numItems; // 商品数
+var col;       // 商品一覧表示の列数
 
 // スクリーンサイズによって表示する商品の列数を変更する
 if (screen.width > 900) {
@@ -16,28 +16,31 @@ contract.methods.numItems().call()
     _numItems = numItems;
     console.log("numItems is " + _numItems);
     
-// DOMの作成
+// DOMを作成する
 }).then(function() {
     var rows = [];
     var table = document.getElementById("table");
-    var row = Math.ceil(_numItems / col);
-    var idx = 0;
+    var row = Math.ceil(_numItems / col); // 商品一覧表示の行数
+    var idx = 0; // 商品番号の初期化
+
     for (i = 0; i < row; i++) {
         rows.push(table.insertRow(-1)); // 行の追加
         for (j = 0; j < col; j++) {
-            cell = rows[i].insertCell(-1);
+            cell = rows[i].insertCell(-1); // セルの追加
 
             if (idx < _numItems) {
                 // 商品の説明と画像を表示するDOMを作成
                 var name = document.createElement("a");          // 商品名
                 var description = document.createElement("div"); // 商品説明
                 var image = document.createElement("a");         // 商品画像
-                    
+                
+                // 商品名をクリックすると商品ページに移動する
                 name.id = "name" + idx;
                 name.href = "item.html?" + idx;
 
                 description.id = "description" + idx;
 
+                // 商品画像をクリックすると商品ページに移動する
                 image.id = "image" + idx;
                 image.href = "item.html?" + idx;
 
@@ -62,7 +65,7 @@ console.log("create DOM");
     }
 });
 
-// 商品一覧を表示する関数
+// 商品情報を表示する関数
 function showItem(idx) {
     console.log("showItem numItems = " + idx);
 
@@ -71,11 +74,12 @@ function showItem(idx) {
         idxList = [3, 5, 11];
             
         for (var i of idxList) {
+            // 価格
             if (i == 5) {
                 var elem = document.createElement("p");
                 elem.textContent = item[i] + "wei";
                 document.getElementById("description" + idx).appendChild(elem);
-            
+            // 出品状態
             } else if (i == 11) {
                 var elem = document.createElement("p");
                 if (item[i] == true) {
@@ -86,7 +90,7 @@ function showItem(idx) {
                     elem.textContent = "出品中";
                 }
                 document.getElementById("description" + idx).appendChild(elem);
-            
+            // 商品名
             } else {
                 var elem = document.createElement("h6");
                 elem.textContent = item[i];
@@ -98,17 +102,17 @@ function showItem(idx) {
         
     // 商品画像を表示する
     contract.methods.images(idx).call().then(function(image) {
-        // imageUrl = "http://drive.google.com/uc?export=view&id=" + image.googleDocID; // googleDriveを使用する場合
         // imageUrl = "http://localhost:8080/ipfs/" + image.ipfsHash; // ipfsがインストールされている場合
-        imageUrl = "https://ipfs.io/ipfs/" + image.ipfsHash; // ipfsがインストールされていない場合
+        // imageUrl = "https://ipfs.io/ipfs/" + image.ipfsHash; // ipfs.io経由，動作しない？
+        imageUrl = "http://drive.google.com/uc?export=view&id=" + image.googleDocID; // googleDriveを使用する場合
         
-        // 生成する要素と属性
+        // img要素を作成し，画像を登録する
         var img = document.createElement("img");
-        img.id = "ipfsImage" + idx;
+        img.id = "itemImage" + idx;
         img.src = imageUrl;
-        img.alt = "ipfsImage" + idx;
+        img.alt = "itemImage" + idx;
 
-        // 画像の読込みを待ってから実行
+        // 画像の読込みを待ってから画像を加工
         img.addEventListener("load", function() {
             // 画像のリサイズ
             var orgWidth  = img.width;

@@ -124,6 +124,20 @@ abi = [
 		"type": "function"
 	},
 	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_numItems",
+				"type": "uint256"
+			}
+		],
+		"name": "refundFromSeller",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
 		"constant": true,
 		"inputs": [],
 		"name": "numItems",
@@ -178,6 +192,20 @@ abi = [
 		],
 		"payable": false,
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "_numItems",
+				"type": "uint256"
+			}
+		],
+		"name": "refundFromOwner",
+		"outputs": [],
+		"payable": true,
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -270,20 +298,6 @@ abi = [
 		],
 		"payable": false,
 		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_numItems",
-				"type": "uint256"
-			}
-		],
-		"name": "sellerRefund",
-		"outputs": [],
-		"payable": true,
-		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -444,20 +458,6 @@ abi = [
 		"outputs": [],
 		"payable": false,
 		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_numItems",
-				"type": "uint256"
-			}
-		],
-		"name": "ownerRefund",
-		"outputs": [],
-		"payable": true,
-		"stateMutability": "payable",
 		"type": "function"
 	},
 	{

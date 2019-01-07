@@ -1,4 +1,4 @@
-// アカウント登録
+// アカウント登録する関数
 function registerAccount() {
     var userName = document.getElementById("userName").value;
     var userEmail = document.getElementById("userEmail").value;

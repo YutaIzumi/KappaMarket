@@ -1,16 +1,16 @@
-var _numBuy;
-var _buyItem;
-var col;
-var threshold = 750;
+var _numBuy;  // 購入した商品数
+var _buyItem; // 購入した商品番号
+var col;      // スクリーンサイズに応じて表示する列数を変更する
+var threshold = 750; // スクリーンサイズの閾値
 
-// スクリーンサイズによって表示方法を変更する
+// スクリーンサイズに応じて表示方法を変更する
 if (screen.width > threshold) {
-    col = 2.0;
+    col = 2.0; // 2列で表示
 } else {
-    col = 1.0;
+    col = 1.0; // 1列で表示
 }
 
-// メタマスクがインストールされているかのチェック
+// メタマスクがインストールされているかチェック
 if (typeof web3 !== "undefined") {
     web3js = new Web3(web3.currentProvider);
 } else {
@@ -19,12 +19,13 @@ if (typeof web3 !== "undefined") {
 
 // コントラクトのアドレス
 // const address = "0xe0a5d61f329ca84c5a8e8d59130d7fe8c0a388f4"; // ver.1.0
-const address = "0xb54de6280f9b11fe39cd18a77446837d3aedb883";
+// const address = "0xb54de6280f9b11fe39cd18a77446837d3aedb883"; // ver.2.0
+const address = "0x712fa6150b41798cb96f5d117e0954407750e335"; // ver.3.0
 
-// コントラクトのインスタンスを生成
+// コントラクトのインスタンスを生成する
 contract = new web3js.eth.Contract(abi, address);
 
-// コントラクトを呼び出すアカウントのアドレス
+// コントラクトを呼び出すアカウントのアドレスを取得する
 web3js.eth.getAccounts(function(err, accounts) {
     coinbase = accounts[0];
     console.log("coinbase is " + coinbase);
@@ -32,24 +33,26 @@ web3js.eth.getAccounts(function(err, accounts) {
         alert("MetaMaskを起動してください．")
     }
 
+    // 購入した商品数を取得する
     contract.methods.accounts(coinbase).call()
     .then(function(account) {
         _numBuy = account.numBuy;
         console.log("numBuy is " + _numBuy);
-    
+
+    // DOMを生成する
     }).then(function() {
-        // DOMの作成
         var rows=[];
         // var table = document.createElement("table");
         var table = document.getElementById("table");
         for (i = 0; i < _numBuy; i++) {
             rows.push(table.insertRow(-1)); // 行の追加
             for(j = 0; j < col; j++) {
-                cell = rows[i].insertCell(-1);
+                cell = rows[i].insertCell(-1); // セルの追加
 
                 if (col == 2) {
+                    // 1列目の表示内容
                     if (j == 0) {
-                        // 商品の説明と画像を表示するDOMを作成
+                        // 商品の説明と画像を表示するDOMを作成する
                         var image = document.createElement("a");
                         var description = document.createElement("div");
 
@@ -58,12 +61,14 @@ web3js.eth.getAccounts(function(err, accounts) {
                         cell.appendChild(image);
                         cell.appendChild(description);
                     
+                    // 2列目の表示内容
                     } else {
-                        // 取引の状態と取引を進めるボタン表示するDOMを作成
+                        // 取引の状態を表示するDOMを作成する
                         var state = document.createElement("div");
                         state.id = "state" + i;
                         cell.appendChild(state);
                         
+                        // 取引を進めるボタンを作成する
                         var receive = document.createElement("p");
                         var btn = document.createElement("button");
                         btn.id = "receive" + i;
@@ -78,7 +83,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                         btn.setAttribute("class", "btn btn-primary");
                         btn.textContent = "出品者を評価";
                         
-                        // 評価を選択するセレクトフォームを作成
+                        // 評価を選択するセレクトフォームを作成する
                         var form = document.createElement("div");
                         form.setAttribute("class", "form-group");
                         
@@ -104,6 +109,7 @@ web3js.eth.getAccounts(function(err, accounts) {
                         sellerEvaluate.appendChild(btn);
                         cell.appendChild(sellerEvaluate);
                     }
+
                 } else {
                     // 商品の説明と画像を表示するDOMを作成
                     var image = document.createElement("a");
@@ -197,7 +203,7 @@ web3js.eth.getAccounts(function(err, accounts) {
     });
 });
 
-// 商品を表示する関数
+// 商品情報を表示する関数
 function showItem(numItem, idx) {
     // 商品説明
     itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
@@ -205,6 +211,7 @@ function showItem(numItem, idx) {
     contract.methods.items(numItem).call().then(function(item) {
         for (var i = 0; i < itemIdxList.length; i++) {
             var elem = document.createElement("p");
+            // 出品状態
             if (i == 3) {
                 if (item[itemIdxList[i]] == true) {
                     elem.textContent = itemKeyList[i] + " : 売切れ";
@@ -212,10 +219,12 @@ function showItem(numItem, idx) {
                     elem.textContent = itemKeyList[i] + " : 出品中";
                 }
                 document.getElementById("description" + idx).appendChild(elem);
+            // その他の商品情報
             } else {
                 elem.textContent = itemKeyList[i] + " : " + item[itemIdxList[i]];
                 document.getElementById("description" + idx).appendChild(elem);
             }
+            // 価格
             if (i == 1) {
                 price = item[itemIdxList[i]];
             }
@@ -225,15 +234,16 @@ function showItem(numItem, idx) {
     // 商品画像
     contract.methods.images(numItem).call().then(function(image) {
         // imageUrl = "http://localhost:8080/ipfs/" + image.ipfsHash; // ipfsがインストールされている場合
-        imageUrl = "https://ipfs.io/ipfs/" + image.ipfsHash;
+        // imageUrl = "https://ipfs.io/ipfs/" + image.ipfsHash; // ipfs.io経由，動作しない？
+        imageUrl = "http://drive.google.com/uc?export=view&id=" + image.googleDocID; // googleDriveを使用する場合
         
-        // 生成する要素と属性
+        // img要素を作成し，画像を登録する
         var img = document.createElement("img");
-        img.id = "ipfsImage" + idx;
+        img.id = "itemImage" + idx;
         img.src = imageUrl;
-        img.alt = "ipfsImage" + idx;
+        img.alt = "itemImage" + idx;
 
-        // 画像の読込みを待ってから実行
+        // 画像の読込みを待ってから画像を加工
         img.addEventListener("load", function() {
             var orgWidth  = img.width;
             var orgHeight = img.height;
