@@ -77,7 +77,8 @@ function showItem(idx) {
             // 価格
             if (i == 5) {
                 var elem = document.createElement("p");
-                elem.textContent = item[i] + "wei";
+                // elem.textContent = item[i] + "wei";
+                elem.textContent = String(Number(item[i]) / 1000000000000000000) + "eth";
                 document.getElementById("description" + idx).appendChild(elem);
             // 出品状態
             } else if (i == 11) {
