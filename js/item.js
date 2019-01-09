@@ -25,7 +25,9 @@ function showItem() {
             // 価格
             } else if (i == 1) {
                 var elem = document.createElement("p");
-                elem.textContent = itemKeyList[i] + item[itemIdxList[i]] + "wei";
+                // elem.textContent = itemKeyList[i] + item[itemIdxList[i]] + "wei";
+                var eth = String(Number(item[itemIdxList[i]]) / 1000000000000000000) + "eth";
+                elem.textContent = itemKeyList[i] + eth;
                 document.getElementById("item").appendChild(elem);
             // 出品状態
             } else if (i == 3) {
