@@ -120,7 +120,8 @@ function showItem(idx) {
         for (var i of idxList) {
             if (i == 5) {
                 var elem = document.createElement("p");
-                elem.textContent = item[i] + "wei";
+                // elem.textContent = item[i] + "wei";
+                elem.textContent = String(Number(item[i]) / 1000000000000000000) + "eth";
                 document.getElementById("description" + idx).appendChild(elem);
             
             } else if (i == 11) {
@@ -144,9 +145,9 @@ function showItem(idx) {
         
     // 商品画像を表示する
     contract.methods.images(idx).call().then(function(image) {
-        // imageUrl = "http://drive.google.com/uc?export=view&id=" + image.googleDocID; // googleDriveを使用する場合
         // imageUrl = "http://localhost:8080/ipfs/" + image.ipfsHash; // ipfsがインストールされている場合
-        imageUrl = "https://ipfs.io/ipfs/" + image.ipfsHash; // ipfsがインストールされていない場合
+        // imageUrl = "https://ipfs.io/ipfs/" + image.ipfsHash; // ipfs.io経由，動作しない？
+        imageUrl = "http://drive.google.com/uc?export=view&id=" + image.googleDocID; // googleDriveを使用する場合
         
         // 生成する要素と属性
         var img = document.createElement("img");

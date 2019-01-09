@@ -257,13 +257,19 @@ web3js.eth.getAccounts(function(err, accounts) {
 function showItem(numItem, idx) {
     // numItem：商品番号，idx：DOMのインデックス
     // 商品説明
-    itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
+    // itemKeyList = ["商品名", "価格(wei)", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
+    itemKeyList = ["商品名", "価格", "商品説明", "状態", "出品者", "出品者のアドレス", "購入者のアドレス"];
     itemIdxList = [3, 5, 4, 11, 2, 0, 1];
     contract.methods.items(numItem).call().then(function(item) {
         for (var i = 0; i < itemIdxList.length; i++) {
             var elem = document.createElement("p");
+            // 価格
+            if (i == 1) {
+                var price = String(Number(item[itemIdxList[i]]) / 1000000000000000000) + "eth";
+                elem.textContent = itemKeyList[i] + " : " + price;
+                document.getElementById("description" + idx).appendChild(elem);
             // 出品状態
-            if (i == 3) {
+            } else if (i == 3) {
                 if (item[itemIdxList[i]] == true) {
                     elem.textContent = itemKeyList[i] + " : 売切れ";
                 } else {
